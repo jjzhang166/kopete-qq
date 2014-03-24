@@ -48,6 +48,7 @@ public:
 	void removeAllContacts();
 private slots:
     void slotimageContact();
+    void slotUserInfo();
 signals:
     void leavingChat( WebqqGroupChatSession *s );
 private:

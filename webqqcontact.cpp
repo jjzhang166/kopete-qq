@@ -204,15 +204,15 @@ QList<KAction *> *WebqqContact::customContextMenuActions() //OBSOLETE
         actions->append( m_blockAction );
          tempCollection.addAction(QLatin1String("contactViewBlock"), m_blockAction);
     }
-    if(!m_profileAction)
-    {
-        m_profileAction = new KAction( KIcon("document-preview"), i18n( "&View Webqq Profile" ), this );
-        connect( m_profileAction, SIGNAL(triggered(bool)), this, SLOT(slotUserInfo()) );
-    }
-    m_profileAction->setEnabled( true );
-    actions->append( m_profileAction );
-    // temporary action collection, used to apply Kiosk policy to the actions  
-    tempCollection.addAction(QLatin1String("contactViewProfile"), m_profileAction);
+//    if(!m_profileAction)
+//    {
+//        m_profileAction = new KAction( KIcon("document-preview"), i18n( "&View Webqq Profile" ), this );
+//        connect( m_profileAction, SIGNAL(triggered(bool)), this, SLOT(slotUserInfo()) );
+//    }
+//    m_profileAction->setEnabled( true );
+//    actions->append( m_profileAction );
+//    // temporary action collection, used to apply Kiosk policy to the actions
+//    tempCollection.addAction(QLatin1String("contactViewProfile"), m_profileAction);
     return actions;
 }
 

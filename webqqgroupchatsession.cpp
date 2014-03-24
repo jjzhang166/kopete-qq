@@ -66,6 +66,12 @@ WebqqGroupChatSession::~WebqqGroupChatSession()
     //emit leavingChat( this );
 }
 
+void WebqqGroupChatSession::slotUserInfo()
+{
+    QList<Kopete::Contact*>contacts = members();
+    static_cast<WebqqContact *>(contacts.first())->slotUserInfo();
+}
+
 void WebqqGroupChatSession::slotimageContact()
 {
     QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open File"),

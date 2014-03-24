@@ -923,10 +923,10 @@ void WebqqAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
     kDebug(WEBQQ_GEN_DEBUG)<<"buddy qqname:"<<QString::fromUtf8(buddy->qqnumber)<<"uin:"<<QString::fromUtf8(buddy->uin);
     /*find out the contact*/ 
     //kDebug(WEBQQ_GEN_DEBUG)<<"find out the contact";
-    if(strcmp(buddy->qqnumber, accountId().toAscii().constData()) == 0)
+    if(QString(buddy->qqnumber) == myself()->contactId())
     {
         Kopete::AvatarManager::AvatarEntry entry;
-        entry.name = myself ()->contactId();;
+        entry.name = myself ()->contactId();
         entry.category = Kopete::AvatarManager::Contact;
         entry.contact = myself();
         entry.image = QImage::fromData(bytearry);
