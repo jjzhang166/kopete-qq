@@ -140,57 +140,6 @@ void WebqqChatSession::slotDisplayPictureChanged()
 {
 	QList<Kopete::Contact*> mb=members();
     WebqqContact *c = static_cast<WebqqContact *>( mb.first() );
-//	if ( c && m_image )
-//	{
-//		if(c->hasProperty(Kopete::Global::Properties::self()->photo().key()))
-//		{
-//#ifdef __GNUC__
-//#warning Port or remove this KToolBar hack
-//#endif
-//#if 0
-//			int sz=22;
-//			// get the size of the toolbar were the aciton is plugged.
-//			//  if you know a better way to get the toolbar, let me know
-//			KXmlGuiWindow *w= view(false) ? dynamic_cast<KXmlGuiWindow*>( view(false)->mainWidget()->topLevelWidget() ) : 0L;
-//			if(w)
-//			{
-//				//We connected that in the constructor.  we don't need to keep this slot active.
-//				disconnect( Kopete::ChatSessionManager::self() , SIGNAL(viewActivated(KopeteView*)) , this, SLOT(slotDisplayPictureChanged()) );
-
-//                KAction *imgAction=actionCollection()->action("WebqqDisplayPicture");
-//				if(imgAction)
-//				{
-//					QList<KToolBar*> toolbarList = w->toolBarList();
-//					QList<KToolBar*>::Iterator it, itEnd = toolbarList.end();
-//					for(it = toolbarList.begin(); it != itEnd; ++it)
-//					{
-//						KToolBar *tb=*it;
-//						if(imgAction->isPlugged(tb))
-//						{
-//							sz=tb->iconSize();
-//							//ipdate if the size of the toolbar change.
-//							disconnect(tb, SIGNAL(modechange()), this, SLOT(slotDisplayPictureChanged()));
-//							connect(tb, SIGNAL(modechange()), this, SLOT(slotDisplayPictureChanged()));
-//							break;
-//						}
-//						++it;
-//					}
-//				}
-//			}
-
-//			QString imgURL=c->property(Kopete::Global::Properties::self()->photo()).value().toString();
-//			QImage scaledImg = QPixmap( imgURL ).toImage().smoothScale( sz, sz );
-//			if(!scaledImg.isNull())
-//				m_image->setPixmap( QPixmap(scaledImg) );
-//			else
-//			{ //the image has maybe not been transferred correctly..  force to download again
-//				c->removeProperty(Kopete::Global::Properties::self()->photo());
-//				//slotDisplayPictureChanged(); //don't do that or we might end in a infinite loop
-//			}
-//			m_image->setToolTip( "<qt><img src=\"" + imgURL + "\"></qt>" );
-//#endif
-//		}
-//	}
 }
 
 #include "webqqchatsession.moc"

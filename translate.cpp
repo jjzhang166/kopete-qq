@@ -134,9 +134,7 @@ static struct smile_entry smile_tables[] = {
     {-1,    {   0   }}
 };
 const char* HTML_SYMBOL = "<[^>]+>|&amp;|&quot;|&gt;|&lt;";
-//font size map space : pidgin:[1,7] to webqq[8:20]
 #define sizemap(num) (6+2*num)
-//font size map space : webqq[8:22] to pidgin [1:8]
 #define sizeunmap(px) ((px-6)/2)
 static char* build_smiley_exp()
 {
@@ -390,10 +388,6 @@ int translate_message_to_struct(LwqqClient* lc,const char* to,const char* what,L
                 c->data.img.data = (char*)s_malloc(img_filesize(fileName));
                 memcpy(c->data.img.data,imgBuffer,img_filesize(fileName));
                 c->data.img.size = img_filesize(fileName);
-//                c = lwqq_msg_fill_upload_offline_pic(
-//                            img_fileName(fileName),
-//                            img_filebuffer(fileName),
-//                            img_filesize(fileName));
             }
        }else if(*begin==':'&&*(end-1)==':'){
             if(strstr(begin,":face")==begin){
@@ -522,8 +516,6 @@ void translate_struct_to_message(qq_account* ac, LwqqMsgMessage* msg, char* buf)
                     inkImage->open();
                     inkImage->write(c->data.img.data, c->data.img.size);
                     inkImage->close();
-                    //int img_id = purple_imgstore_add_with_id(c->data.img.data,c->data.img.size,NULL);
-                    //let it freed by purple
                     c->data.img.data = NULL;
                     //make it room to change num if necessary.
                     snprintf(piece,sizeof(piece),"<img src=\"%s\" />",inkImage->fileName().toUtf8().constData());
@@ -552,7 +544,6 @@ void translate_struct_to_message(qq_account* ac, LwqqMsgMessage* msg, char* buf)
                 inkImage->open();
                 inkImage->write(c->data.img.data, c->data.img.size);
                 inkImage->close();
-                //let it freed by purple
                 c->data.cface.data = NULL;
                 snprintf(piece,sizeof(piece),"<img src=\"%s\"/>",inkImage->fileName().toUtf8().constData());
                 strcat(buf,piece);
@@ -596,142 +587,8 @@ void translate_global_init()
         if(err){lwqq_puts(err);assert(0);}
         assert(_regex!=NULL);
     }
-#if 0
-    if(smily_hash ==NULL){
-        GHashTable *t = g_hash_table_new_full(g_str_hash,g_str_equal,NULL,NULL);
-        struct smile_entry* entry = &smile_tables[0];
-        long id;
-        const char** ptr;
-        char* smiley;
-        
-        while(entry->id!=-1){
-            //shift id let 0 means failed
-            id = entry->id+1;
-            ptr = entry->smile;
-            while(*ptr){
-                smiley = (char*)(*ptr);
-                g_hash_table_insert(t,smiley,(gpointer)id);
-                ptr++;
-            }
-            entry++;
-        }
-        smily_hash = t;
-/*
-        purple_smiley_new_from_file("[FACE_14]",FACE_DIR"0.gif");
-        purple_smiley_new_from_file("[FACE_1]",FACE_DIR"1.gif");
-        purple_smiley_new_from_file("[FACE_2]",FACE_DIR"2.gif");
-        purple_smiley_new_from_file("[FACE_3]",FACE_DIR"3.gif");
-        purple_smiley_new_from_file("[FACE_4]",FACE_DIR"4.gif");
-        purple_smiley_new_from_file("[FACE_5]",FACE_DIR"5.gif");
-        purple_smiley_new_from_file("[FACE_6]",FACE_DIR"6.gif");
-        purple_smiley_new_from_file("[FACE_7]",FACE_DIR"7.gif");
-        purple_smiley_new_from_file("[FACE_8]",FACE_DIR"8.gif");
-        purple_smiley_new_from_file("[FACE_9]",FACE_DIR"9.gif");
-        purple_smiley_new_from_file("[FACE_10]",FACE_DIR"10.gif");
-        purple_smiley_new_from_file("[FACE_11]",FACE_DIR"11.gif");
-        purple_smiley_new_from_file("[FACE_12]",FACE_DIR"12.gif");
-        purple_smiley_new_from_file("[FACE_13]",FACE_DIR"13.gif");
-        purple_smiley_new_from_file("[FACE_0]",FACE_DIR"14.gif");
-        purple_smiley_new_from_file("[FACE_50]",FACE_DIR"15.gif");
-        purple_smiley_new_from_file("[FACE_51]",FACE_DIR"16.gif");
-        purple_smiley_new_from_file("[FACE_96]",FACE_DIR"17.gif");
-        purple_smiley_new_from_file("[FACE_53]",FACE_DIR"18.gif");
-        purple_smiley_new_from_file("[FACE_54]",FACE_DIR"19.gif");
-        purple_smiley_new_from_file("[FACE_73]",FACE_DIR"20.gif");
-        purple_smiley_new_from_file("[FACE_74]",FACE_DIR"21.gif");
-        purple_smiley_new_from_file("[FACE_75]",FACE_DIR"22.gif");
-        purple_smiley_new_from_file("[FACE_76]",FACE_DIR"23.gif");
-        purple_smiley_new_from_file("[FACE_77]",FACE_DIR"24.gif");
-        purple_smiley_new_from_file("[FACE_78]",FACE_DIR"25.gif");
-        purple_smiley_new_from_file("[FACE_55]",FACE_DIR"26.gif");
-        purple_smiley_new_from_file("[FACE_56]",FACE_DIR"27.gif");
-        purple_smiley_new_from_file("[FACE_57]",FACE_DIR"28.gif");
-        purple_smiley_new_from_file("[FACE_58]",FACE_DIR"29.gif");
-        purple_smiley_new_from_file("[FACE_79]",FACE_DIR"30.gif");
-        purple_smiley_new_from_file("[FACE_80]",FACE_DIR"31.gif");
-        purple_smiley_new_from_file("[FACE_81]",FACE_DIR"32.gif");
-        purple_smiley_new_from_file("[FACE_82]",FACE_DIR"33.gif");
-        purple_smiley_new_from_file("[FACE_83]",FACE_DIR"34.gif");
-        purple_smiley_new_from_file("[FACE_84]",FACE_DIR"35.gif");
-        purple_smiley_new_from_file("[FACE_85]",FACE_DIR"36.gif");
-        purple_smiley_new_from_file("[FACE_86]",FACE_DIR"37.gif");
-        purple_smiley_new_from_file("[FACE_87]",FACE_DIR"38.gif");
-        purple_smiley_new_from_file("[FACE_88]",FACE_DIR"39.gif");
-        purple_smiley_new_from_file("[FACE_97]",FACE_DIR"40.gif");
-        purple_smiley_new_from_file("[FACE_98]",FACE_DIR"41.gif");
-        purple_smiley_new_from_file("[FACE_99]",FACE_DIR"42.gif");
-        purple_smiley_new_from_file("[FACE_100]",FACE_DIR"43.gif");
-        purple_smiley_new_from_file("[FACE_101]",FACE_DIR"44.gif");
-        purple_smiley_new_from_file("[FACE_102]",FACE_DIR"45.gif");
-        purple_smiley_new_from_file("[FACE_103]",FACE_DIR"46.gif");
-        purple_smiley_new_from_file("[FACE_104]",FACE_DIR"47.gif");
-        purple_smiley_new_from_file("[FACE_105]",FACE_DIR"48.gif");
-        purple_smiley_new_from_file("[FACE_106]",FACE_DIR"49.gif");
-        purple_smiley_new_from_file("[FACE_107]",FACE_DIR"50.gif");
-        purple_smiley_new_from_file("[FACE_108]",FACE_DIR"51.gif");
-        purple_smiley_new_from_file("[FACE_109]",FACE_DIR"52.gif");
-        purple_smiley_new_from_file("[FACE_110]",FACE_DIR"53.gif");
-        purple_smiley_new_from_file("[FACE_111]",FACE_DIR"54.gif");
-        purple_smiley_new_from_file("[FACE_112]",FACE_DIR"55.gif");
-        purple_smiley_new_from_file("[FACE_32]",FACE_DIR"56.gif");
-        purple_smiley_new_from_file("[FACE_113]",FACE_DIR"57.gif");
-        purple_smiley_new_from_file("[FACE_114]",FACE_DIR"58.gif");
-        purple_smiley_new_from_file("[FACE_115]",FACE_DIR"59.gif");
-        purple_smiley_new_from_file("[FACE_63]",FACE_DIR"60.gif");
-        purple_smiley_new_from_file("[FACE_64]",FACE_DIR"61.gif");
-        purple_smiley_new_from_file("[FACE_59]",FACE_DIR"62.gif");
-        purple_smiley_new_from_file("[FACE_33]",FACE_DIR"63.gif");
-        purple_smiley_new_from_file("[FACE_34]",FACE_DIR"64.gif");
-        purple_smiley_new_from_file("[FACE_116]",FACE_DIR"65.gif");
-        purple_smiley_new_from_file("[FACE_36]",FACE_DIR"66.gif");
-        purple_smiley_new_from_file("[FACE_37]",FACE_DIR"67.gif");
-        purple_smiley_new_from_file("[FACE_38]",FACE_DIR"68.gif");
-        purple_smiley_new_from_file("[FACE_91]",FACE_DIR"69.gif");
-        purple_smiley_new_from_file("[FACE_92]",FACE_DIR"70.gif");
-        purple_smiley_new_from_file("[FACE_93]",FACE_DIR"71.gif");
-        purple_smiley_new_from_file("[FACE_29]",FACE_DIR"72.gif");
-        purple_smiley_new_from_file("[FACE_117]",FACE_DIR"73.gif");
-        purple_smiley_new_from_file("[FACE_72]",FACE_DIR"74.gif");
-        purple_smiley_new_from_file("[FACE_45]",FACE_DIR"75.gif");
-        purple_smiley_new_from_file("[FACE_42]",FACE_DIR"76.gif");
-        purple_smiley_new_from_file("[FACE_39]",FACE_DIR"77.gif");
-        purple_smiley_new_from_file("[FACE_62]",FACE_DIR"78.gif");
-        purple_smiley_new_from_file("[FACE_46]",FACE_DIR"79.gif");
-        purple_smiley_new_from_file("[FACE_47]",FACE_DIR"80.gif");
-        purple_smiley_new_from_file("[FACE_71]",FACE_DIR"81.gif");
-        purple_smiley_new_from_file("[FACE_95]",FACE_DIR"82.gif");
-        purple_smiley_new_from_file("[FACE_118]",FACE_DIR"83.gif");
-        purple_smiley_new_from_file("[FACE_119]",FACE_DIR"84.gif");
-        purple_smiley_new_from_file("[FACE_120]",FACE_DIR"85.gif");
-        purple_smiley_new_from_file("[FACE_121]",FACE_DIR"86.gif");
-        purple_smiley_new_from_file("[FACE_122]",FACE_DIR"87.gif");
-        purple_smiley_new_from_file("[FACE_123]",FACE_DIR"88.gif");
-        purple_smiley_new_from_file("[FACE_124]",FACE_DIR"89.gif");
-        purple_smiley_new_from_file("[FACE_27]",FACE_DIR"90.gif");
-        purple_smiley_new_from_file("[FACE_21]",FACE_DIR"91.gif");
-        purple_smiley_new_from_file("[FACE_23]",FACE_DIR"92.gif");
-        purple_smiley_new_from_file("[FACE_25]",FACE_DIR"93.gif");
-        purple_smiley_new_from_file("[FACE_26]",FACE_DIR"94.gif");
-        purple_smiley_new_from_file("[FACE_125]",FACE_DIR"95.gif");
-        purple_smiley_new_from_file("[FACE_126]",FACE_DIR"96.gif");
-        purple_smiley_new_from_file("[FACE_127]",FACE_DIR"97.gif");
-        purple_smiley_new_from_file("[FACE_128]",FACE_DIR"98.gif");
-        purple_smiley_new_from_file("[FACE_129]",FACE_DIR"99.gif");
-        purple_smiley_new_from_file("[FACE_130]",FACE_DIR"100.gif");
-        purple_smiley_new_from_file("[FACE_131]",FACE_DIR"101.gif");
-        purple_smiley_new_from_file("[FACE_132]",FACE_DIR"102.gif");
-        purple_smiley_new_from_file("[FACE_133]",FACE_DIR"103.gif");
-        purple_smiley_new_from_file("[FACE_134]",FACE_DIR"104.gif");
-        */
-    }
-#endif
 }
-void remove_all_smiley(void* data,void* userdata)
-{
-#if 0
-    purple_smiley_delete((PurpleSmiley*)data);
-#endif
-}
+
 void translate_global_free()
 {
     if(_regex){
@@ -742,56 +599,10 @@ void translate_global_free()
         trex_free(hs_regex);
         hs_regex = NULL;
     }
-#if 0
-    if(smily_hash) {
-        g_hash_table_remove_all(smily_hash);
-        smily_hash = NULL;
-        GList* list = purple_smileys_get_all();
-        g_list_foreach(list,remove_all_smiley,NULL);
-        g_list_free(list);
-    }
-#endif
 }
 const char* translate_smile(int face)
 {
-#if 0
     static char buf[64];
-    struct smile_entry* entry = &smile_tables[0];
-    while(entry->id != face&&entry->id!=-1){
-        entry++;
-    }
-    buf[0]=0;
-    if(entry->id!=-1){
-        strncpy(buf,entry->smile[0],sizeof(buf));
-        if(buf[0]=='/') strcat(buf," ");
-    }
-    return buf;
-#else
-     static char buf[64];
     snprintf(buf, sizeof(buf), ":face%d:",face);
-#endif
     return buf;
 }
-
-void add_smiley(void* data,void* userdata)
-{
-#if 0
-    PurpleConversation* conv = userdata;
-    PurpleSmiley* smiley = data;
-    const char* shortcut = purple_smiley_get_shortcut(smiley);
-    purple_conv_custom_smiley_add(conv,shortcut,NULL,NULL,0);
-    size_t len;
-    const void* d = purple_smiley_get_data(smiley,&len);
-    purple_conv_custom_smiley_write(conv,shortcut,d,len);
-    purple_conv_custom_smiley_close(conv,shortcut);
-#endif
-}
-
-#if 0
-void translate_add_smiley_to_conversation(PurpleConversation* conv)
-{
-    GList* list = purple_smileys_get_all();
-    g_list_foreach(list,add_smiley,conv);
-    g_list_free(list);
-}
-#endif

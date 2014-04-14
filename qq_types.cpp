@@ -84,7 +84,7 @@ const char* qq_level_to_str(int level)
 
 int did_dispatch(void* param)
 {
-    LwqqCommand *d = param;
+    LwqqCommand *d = (LwqqCommand *)param;
     vp_do(*d,NULL);
     s_free(d);
     return 0;
@@ -92,194 +92,42 @@ int did_dispatch(void* param)
 
 void qq_dispatch(LwqqCommand cmd)
 {
-    LwqqCommand* d = s_malloc0(sizeof(*d));
+    LwqqCommand* d = (LwqqCommand*)s_malloc0(sizeof(*d));
     *d = cmd;
     did_dispatch(d);
 }
 
 
-//qq_account* qq_account_new(PurpleAccount* account)
 qq_account* qq_account_new(char *username, char *password)
 {
     qq_account* ac = (qq_account*)malloc(sizeof(qq_account));
-//    ac->account = account;
     ac->magic = QQ_MAGIC;
-    ac->flag = 0;
-    //this is auto increment sized array . so don't worry about it.
-//    ac->opend_chat = g_ptr_array_sized_new(10);
- //   const char* username = purple_account_get_username(account);
-//    const char* password = purple_account_get_password(account);
-//    const char *username = "20096710";
-//    const char *password = "zzg5040";
+    ac->flag = (lwflags)0;
 
     
     ac->qq = lwqq_client_new(username, password);
     ac->js = qq_js_init();
- //   ac->sys_log = purple_log_new(PURPLE_LOG_SYSTEM, "system", account, NULL, time(NULL), NULL);
 
     ac->font.family = s_strdup("宋体");
     ac->font.size = 12;
     ac->font.style = 0;
 
-    //lwqq_async_set(ac->qq,1);
-#if QQ_USE_FAST_INDEX
-    ac->qq->find_buddy_by_uin = find_buddy_by_uin;
-    ac->qq->find_buddy_by_qqnumber = find_buddy_by_qqnumber;
-    ac->fast_index.uin_index = g_hash_table_new_full(g_str_hash,g_str_equal,g_free,g_free);
-    ac->fast_index.qqnum_index = g_hash_table_new_full(g_str_hash,g_str_equal,g_free,NULL);
-#endif
     ac->qq->dispatch = qq_dispatch;
     
     return ac;
 }
 void qq_account_free(qq_account* ac)
-{
-  /*
-    int i;
-    PurpleConnection* gc = purple_account_get_connection(ac->account);
-    for(i=0;i<ac->opend_chat->len;i++){
-        purple_conversation_destroy(purple_find_chat(gc, i));
-    }
-    purple_log_free(ac->sys_log);
- */
+{  
     qq_js_close(ac->js);
-  //  g_ptr_array_free(ac->opend_chat,1);
-    //s_free(ac->recent_group_name);
-    //s_free(ac->font.family);
-
-    //g_free(ac);
-  
-  
- /*   
-    PurpleConnection* gc = purple_account_get_connection(ac->account);
-    for(i=0;i<ac->opend_chat->len;i++){
-        purple_conversation_destroy(purple_find_chat(gc, i));
-    }
-    purple_log_free(ac->sys_log);
-    qq_js_close(ac->js);
-    g_ptr_array_free(ac->opend_chat,1);
-    
-    s_free(ac->recent_group_name);
-    s_free(ac->font.family);
-#if QQ_USE_FAST_INDEX
-    g_hash_table_destroy(ac->fast_index.qqnum_index);
-    g_hash_table_destroy(ac->fast_index.uin_index);
-#endif
-    g_free(ac);
-*/
 }
 
-void qq_account_insert_index_node(qq_account* ac,const LwqqBuddy* b,const LwqqGroup* g)
-{
-#if QQ_USE_FAST_INDEX
-    if(!ac || (!b && !g)) return;
-    index_node* node = s_malloc0(sizeof(*node));
-    int type = b?NODE_IS_BUDDY:NODE_IS_GROUP;
-    node->type = type;
-    if(type == NODE_IS_BUDDY){
-        node->node = b;
-        const LwqqBuddy* buddy = b;
-        g_hash_table_insert(ac->fast_index.uin_index,s_strdup(buddy->uin),node);
-        if(buddy->qqnumber)
-            g_hash_table_insert(ac->fast_index.qqnum_index,s_strdup(buddy->qqnumber),node);
-    }else{
-        node->node = g;
-        const LwqqGroup* group = g;
-        g_hash_table_insert(ac->fast_index.uin_index,s_strdup(group->gid),node);
-        if(group->account)
-            g_hash_table_insert(ac->fast_index.qqnum_index,s_strdup(group->account),node);
-    }
-#endif
-}
-void qq_account_remove_index_node(qq_account* ac,const LwqqBuddy* b,const LwqqGroup* g)
-{
-#if QQ_USE_FAST_INDEX
-    if(!ac || !(b && !g)) return;
-    int type = b?NODE_IS_BUDDY:NODE_IS_GROUP;
-    if(type == NODE_IS_BUDDY){
-        const LwqqBuddy* buddy = b;
-        if(buddy->qqnumber)g_hash_table_remove(ac->fast_index.qqnum_index,buddy->qqnumber);
-        g_hash_table_remove(ac->fast_index.uin_index,buddy->uin);
-    }else{
-        const LwqqGroup* group = g;
-        if(group->account) g_hash_table_remove(ac->fast_index.qqnum_index,group->account);
-        g_hash_table_remove(ac->fast_index.uin_index,group->gid);
-    }
-#endif
-}
-
-int open_new_chat(qq_account* ac,LwqqGroup* group)
-{
- /*
-    GPtrArray* opend_chat = ac->opend_chat;
-    int index;
-    for(index = 0;index<opend_chat->len;index++){
-        if(g_ptr_array_index(opend_chat,index)==group)
-            return index;
-    }
-    g_ptr_array_add(opend_chat,group);
-    return index;
-*/
-    return 0;
-  
-}
-
-
-//void qq_sys_msg_write(qq_account* ac,LwqqMsgType m_t,const char* serv_id,const char* msg,PurpleMessageFlags type,time_t t)
-void qq_sys_msg_write(qq_account* ac,LwqqMsgType m_t,const char* serv_id,const char* msg,time_t t)
-{
-/*
-    //ac->qq->dispatch(vp_func_2p,(CALLBACK_FUNC)sys_msg_write,ac->qq,system_msg_new(m_t,serv_id,ac,msg,type,t));
-
-    PurpleConversation* conv = find_conversation(m_t,serv_id,ac);
-    if(conv)
-        purple_conversation_write(conv,NULL,msg,type,t);
-*/
-}
-
-/*
-PurpleConversation* find_conversation(LwqqMsgType msg_type,const char* serv_id,qq_account* ac)
-{
-    PurpleAccount* account = ac->account;
-    const char* local_id;
-    if(msg_type == LWQQ_MS_BUDDY_MSG || msg_type == LWQQ_MS_SESS_MSG){
-        if(ac->flag&QQ_USE_QQNUM){
-            LwqqBuddy* buddy = ac->qq->find_buddy_by_uin(ac->qq,serv_id);
-            local_id = (buddy&&buddy->qqnumber)?buddy->qqnumber:serv_id;
-        }else local_id = serv_id;
-        return purple_find_conversation_with_account(PURPLE_CONV_TYPE_IM,local_id,account);
-    } else if(msg_type == LWQQ_MS_GROUP_MSG || msg_type == LWQQ_MS_DISCU_MSG){
-        if(ac->flag&QQ_USE_QQNUM){
-            LwqqGroup* group = find_group_by_gid(ac->qq,serv_id);
-            local_id = (group&&group->account)?group->account:serv_id;
-        }else local_id = serv_id;
-        return purple_find_conversation_with_account(PURPLE_CONV_TYPE_CHAT,local_id,account);
-    } else 
-        return NULL;
-}
-*/
 
 LwqqBuddy* find_buddy_by_qqnumber(LwqqClient* lc,const char* qqnum)
 {
-    qq_account* ac = lwqq_client_userdata(lc);
-#if QQ_USE_FAST_INDEX
-    index_node* node = g_hash_table_lookup(ac->fast_index.qqnum_index,qqnum);
-    if(node == NULL) return NULL;
-    if(node->type != NODE_IS_BUDDY) return NULL;
-    return (LwqqBuddy*)node->node;
-#else
     return lwqq_buddy_find_buddy_by_qqnumber(lc, qqnum);
-#endif
 }
 LwqqGroup* find_group_by_qqnumber(LwqqClient* lc,const char* qqnum)
 {
-    qq_account* ac = lwqq_client_userdata(lc);
-#if QQ_USE_FAST_INDEX
-    index_node* node = g_hash_table_lookup(ac->fast_index.qqnum_index,qqnum);
-    if(node == NULL) return NULL;
-    if(node->type != NODE_IS_GROUP) return NULL;
-    return (LwqqGroup*)node->node;
-#else
     LwqqGroup* group;
     LIST_FOREACH(group,&lc->groups,entries) {
         if(!group->account) continue;
@@ -287,32 +135,15 @@ LwqqGroup* find_group_by_qqnumber(LwqqClient* lc,const char* qqnum)
             return group;
     }
     return NULL;
-#endif
 }
 
 LwqqBuddy* find_buddy_by_uin(LwqqClient* lc,const char* uin)
 {
-#if QQ_USE_FAST_INDEX
-    qq_account* ac = lwqq_client_userdata(lc);
-    index_node* node = g_hash_table_lookup(ac->fast_index.uin_index,uin);
-    if(node == NULL) return NULL;
-    if(node->type != NODE_IS_BUDDY) return NULL;
-    return (LwqqBuddy*)node->node;
-#else
     return lwqq_buddy_find_buddy_by_uin(lc, uin);
-#endif
 }
 LwqqGroup* find_group_by_gid(LwqqClient* lc,const char* gid)
 {
-#if QQ_USE_FAST_INDEX
-    qq_account* ac = lwqq_client_userdata(lc);
-    index_node* node = g_hash_table_lookup(ac->fast_index.uin_index,gid);
-    if(node == NULL) return NULL;
-    if(node->type != NODE_IS_GROUP) return NULL;
-    return (LwqqGroup*)node->node;
-#else
     return lwqq_group_find_group_by_gid(lc, gid);
-#endif
 }
 void vp_func_4pl(CALLBACK_FUNC func,vp_list* vp,void* q)
 {
@@ -334,17 +165,6 @@ void vp_func_4pl(CALLBACK_FUNC func,vp_list* vp,void* q)
     long p5 = vp_arg(*vp,long);
     ((f)func)(p1,p2,p3,p4,p5);
 }
-struct qq_extra_info* get_extra_info(LwqqClient* lc,const char* uin)
-{
-#if QQ_USE_FAST_INDEX
-    qq_account* ac = lwqq_client_userdata(lc);
-    index_node* node = g_hash_table_lookup(ac->fast_index.uin_index,uin);
-    if(node == NULL) return NULL;
-    //return &node->info;
-    return NULL;
-#endif
-}
-
 
 LwqqErrorCode qq_download(const char* url,const char* file,const char* dir)
 {

@@ -451,17 +451,13 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
    
 
     if(ev == NULL){
-        //qq_sys_msg_write(ac,msg->type,serv_id,_("Message body too long"),PURPLE_MESSAGE_ERROR,time(NULL));
+
     }else{
         int err = lwqq_async_event_get_result(ev);
         static char buf[1024]={0};
-        //PurpleConversation* conv = find_conversation(msg->type,serv_id,ac);
-
         if(err > 0){
-            snprintf(buf,sizeof(buf),_("Send failed, err:%d:\n%s"),err,what);
-            
+            snprintf(buf,sizeof(buf),_("Send failed, err:%d:\n%s"),err,what);            
 	    printf("FUNCTION: %s, %s\n",__FUNCTION__, buf);
-	    //qq_sys_msg_write(ac, msg->type, serv_id, buf, PURPLE_MESSAGE_ERROR, time(NULL));
         }
         if(err == LWQQ_EC_LOST_CONN){
             vp_do_repeat(ac->qq->events->poll_lost, NULL);
@@ -469,7 +465,7 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
     }
     if(mmsg->upload_retry <0)
     {
-        //qq_sys_msg_write(ac, msg->type, serv_id, _("Upload content retry over limit"), PURPLE_MESSAGE_ERROR, time(NULL));
+
     }
     if(msg->type == LWQQ_MS_GROUP_MSG) 
       mmsg->group.group_code = NULL;
@@ -553,44 +549,6 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
     LwqqMsg* msg;
     LwqqMsgMessage *mmsg;
     qq_account *ac = (qq_account*)(lc->data);
-#if QQ_USE_FAST_INDEX
-    LwqqGroup* group = NULL;
-    LwqqSimpleBuddy* sb = NULL;
-    int ret = 0;
-    if((ret = find_group_and_member_by_card(lc, who, &group, &sb))){
-        if(ret==-1||!sb->group_sig){
-            LwqqAsyncEvent* ev = NULL;
-            if(ret==-1)//member list is empty
-                ev = lwqq_info_get_group_detail_info(lc, group, NULL);
-            else if(!sb->group_sig)
-                ev = lwqq_info_get_group_sig(lc,group,sb->uin);
-            char* who_ = s_strdup(who);
-            char* what_ = s_strdup(what);
-            lwqq_async_add_event_listener(ev, _C_(3pi,qq_send_im,gc,who_,what_,flags));
-            lwqq_async_add_event_listener(ev, _C_(p,free,who_));
-            lwqq_async_add_event_listener(ev, _C_(p,free,what_));
-            return !send_visual;
-        }
-
-        msg = lwqq_msg_new(LWQQ_MS_SESS_MSG);
-        mmsg = (LwqqMsgMessage*)msg;
-
-        mmsg->super.to = s_strdup(sb->uin);
-        mmsg->sess.group_sig = s_strdup(sb->group_sig);
-        mmsg->sess.service_type = group->type;
-    } else {
-        msg = lwqq_msg_new(LWQQ_MS_BUDDY_MSG);
-        mmsg = (LwqqMsgMessage*)msg;
-        if(ac->flag&QQ_USE_QQNUM){
-            LwqqBuddy* buddy = find_buddy_by_qqnumber(lc,who);
-            if(buddy)
-                mmsg->super.to = s_strdup(buddy->uin);
-            else mmsg->super.to = s_strdup(who);
-        }else{
-            mmsg->super.to = s_strdup(who);
-        }
-    }
-#else
     LwqqGroup* group = NULL;
     LwqqSimpleBuddy* sb = NULL;
     int ret = 0;
@@ -626,8 +584,6 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
         else mmsg->super.to = s_strdup(who);
     }
 
-
-#endif
     mmsg->f_name = s_strdup(ac->font.family);
     mmsg->f_size = ac->font.size;
     mmsg->f_style = ac->font.style;

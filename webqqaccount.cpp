@@ -103,23 +103,15 @@ WebqqAccount::WebqqAccount( WebqqProtocol *parent, const QString& accountID )
     this->cleanAll_contacts();
 	m_targetStatus = Kopete::OnlineStatus::Offline;
 	
-    QString filename = "/home/zj/497717277.png";
-    QFile f(filename);
-    avatarData.clear();
-    if (f.exists() && f.size() > 0 && f.open(QIODevice::ReadOnly))
-    {
-        kDebug(WEBQQ_GEN_DEBUG)<<"read";
-        avatarData = f.readAll();
-        f.close();
-    }
-
-	int relink_retry = 0;
-	
-//	if((relink_retry = purple_account_get_int(account, "relink_retry", 0))>0)
-//	    ac->relink_timer = purple_timeout_add_seconds(relink_retry*60, relink_keepalive, ac);
-//	lwqq_log_set_level(purple_account_get_int(account,"verbose",0));
-
-	
+//    QString filename = "/home/zj/497717277.png";
+//    QFile f(filename);
+//    avatarData.clear();
+//    if (f.exists() && f.size() > 0 && f.open(QIODevice::ReadOnly))
+//    {
+//        kDebug(WEBQQ_GEN_DEBUG)<<"read";
+//        avatarData = f.readAll();
+//        f.close();
+//    }
 	qRegisterMetaType<CallbackObject>("CallbackObject");
 
 	QObject::connect( ObjectInstance::instance(), SIGNAL(signal_from_instance(CallbackObject)),
@@ -259,27 +251,7 @@ void WebqqAccount::destoryLwqqAccount()
 
     if(lwqq_client_logined(ac->qq))
         lwqq_logout(ac->qq,&err);
-    lwqq_msglist_close(ac->qq->msg_list);
-/*
-    LwqqGroup* g;
-    LIST_FOREACH(g,&ac->qq->groups,entries){ 
-        qq_cgroup_free((qq_chat_group*)g->data);
-    }
-*/
-//    lwqq_client_free(ac->qq);
-//    lwdb_userdb_free(ac->db);
-//    qq_account_free(ac);
-//   purple_connection_set_protocol_data(gc,NULL);
-    //translate_global_free();
-/*
-    g_ref_count -- ;
-    if(g_ref_count == 0){
-        lwqq_http_global_free();
-        lwqq_async_global_quit();
-        lwdb_global_free();
-    }
-*/  
-  
+    lwqq_msglist_close(ac->qq->msg_list); 
     m_lc = NULL;
 }
 
@@ -546,23 +518,6 @@ void WebqqAccount::group_message(LwqqClient *lc, LwqqMsgMessage *msg)
             else
                 sendId = QString(msg->group.send);
         }
-        //    else{
-        //        sendId = QString(msg->group.send);
-        //        LwqqSimpleBuddy* member;
-        //        LIST_FOREACH(member,&group->members,entries)
-        //        {
-        //            if(strcmp(member->uin, msg->group.send) == 0)
-        //            {
-        //                if(member->card)
-        //                    sendMsg = QString("<span style=\"   color:#0000ff; font-size:10pt;\">%1  %2</span><br>").arg(QString::fromUtf8(member->card))\
-        //                            .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) +  sendMsg;
-        //                else if(member->nick)
-        //                    sendMsg = QString("<span style=\"   color:#0000ff; font-size:10pt;\">%1  %2</span><br>").arg(QString::fromUtf8(member->nick))\
-        //                            .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")) +  sendMsg;
-        //                break;
-        //            }
-        //        }
-        //    }
         QDateTime msgDT;
         msgDT.setTime_t(msg->time);
         Kopete::Message kmsg( contact(sendId), justMe );
@@ -759,7 +714,6 @@ void WebqqAccount::ac_qq_set_group_name(LwqqGroup *group)
     if(contact(id))
     {
         contact(id)->set_group_name(QString::fromUtf8(gname));
-        //contact(id)->setProperty(Kopete::Global::Properties::self ()->nickName (), QString::fromUtf8(gname));
         contact(id)->metaContact()->setDisplayName(QString::fromUtf8(gname));
     }
 }
@@ -918,7 +872,6 @@ void WebqqAccount::blist_change(LwqqClient *lc, LwqqMsgBlistChange *blist)
 
 void WebqqAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
 {   
-    //printf("[%s] qq: %s, stat is: %d, len:%d\n",__FUNCTION__, buddy->qqnumber, buddy->stat, buddy->avatar_len);
     QByteArray bytearry(buddy->avatar, buddy->avatar_len);
     kDebug(WEBQQ_GEN_DEBUG)<<"buddy qqname:"<<QString::fromUtf8(buddy->qqnumber)<<"uin:"<<QString::fromUtf8(buddy->uin);
     /*find out the contact*/ 
@@ -976,7 +929,7 @@ void WebqqAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
 
             //kDebug(WEBQQ_GEN_DEBUG)<<"avatarData size:" << avatarData.size();
             //QFile::remove(filename);
-            friendContact->setDisplayPicture(avatarData);
+            //friendContact->setDisplayPicture(avatarData);
         }
     }
     buddy->avatar = NULL;
@@ -1006,9 +959,9 @@ void WebqqAccount::ac_group_avatar(LwqqClient *lc, LwqqGroup *group)
       contact->setDisplayPicture(bytearry);
     }else{
 
-        kDebug(WEBQQ_GEN_DEBUG)<<"avatarData size:" << avatarData.size();
-        //QFile::remove(filename);
-        contact->setDisplayPicture(avatarData);
+//        kDebug(WEBQQ_GEN_DEBUG)<<"avatarData size:" << avatarData.size();
+//        //QFile::remove(filename);
+//        contact->setDisplayPicture(avatarData);
     }
 }
 
@@ -1213,66 +1166,60 @@ void WebqqAccount::ac_need_verify2(LwqqClient* lc, LwqqVerifyCode* code)
 
 
 
-void test(LwqqClient *lc)
-{
-  printf("has called test\n");
-}
 
 void WebqqAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
 {
-     LwqqErrorCode err = *p_err;
-     QString message;
-     switch(err){
-        case LWQQ_EC_OK:
-	    message = i18n( "Connect OK");
-	    //KNotification::event( "Connect OK", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
+    LwqqErrorCode err = *p_err;
+    QString message;
+    switch(err){
+    case LWQQ_EC_OK:
+        message = i18n( "Connect OK");
+        //KNotification::event( "Connect OK", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
         //myself()->setOnlineStatus( m_targetStatus );
-	    password().setWrong(false);
-	    
+        password().setWrong(false);
+
         afterLogin(lc);
-            break;
-	case LWQQ_EC_ERROR: /*error verify code or error password or error username*/
+        break;
+    case LWQQ_EC_ERROR: /*error verify code or error password or error username*/
         //printf("err msg: %s\n",lc->last_err);
         if (strncmp(lc->last_err, "Wrong username or password", strlen("Wrong username or password")) == 0)
-	    {	
-		password().setWrong();
-		/*this is very ugly, since we need user to reinput verfy code*/
-		message = i18n( "Password Error!");
-		KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-		//KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
-	    }
+        {
+            password().setWrong();
+            /*this is very ugly, since we need user to reinput verfy code*/
+            message = i18n( "Password Error!");
+            KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+            //KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
+        }
         else if (strncmp(lc->last_err, "Wrong verify code", strlen("Wrong verify code")) == 0)
-	    {
-		/*this is very ugly, since we need user to reinput verfy code*/
-        lc->vc = NULL;
-		message = i18n( "Verify Code Error!");
-		KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-		//KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
-	    }
-	    myself()->setOnlineStatus( m_protocol->WebqqOffline);   
-	    disconnected( Manual );			// don't reconnect
-	    return;
-	case LWQQ_EC_LOGIN_ABNORMAL:
-	    disconnected( Manual );			// don't reconnect
-	    message = i18n( "Login Abnormal!");
-	    KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-	    myself()->setOnlineStatus( m_protocol->WebqqOffline);
-            //purple_connection_error_reason(gc,PURPLE_CONNECTION_ERROR_OTHER_ERROR,_("Account Problem Occurs,Need lift the ban"));
-            return ;
-        case LWQQ_EC_NETWORK_ERROR:
-	    disconnected( Manual );			// don't reconnect
-	    myself()->setOnlineStatus( m_protocol->WebqqOffline);
-	    message = i18n( "Network error!");
-	    KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-            //purple_connection_error_reason(gc,PURPLE_CONNECTION_ERROR_OTHER_ERROR,_("Network Error"));
-            return;
-        default:
-         kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
-	    disconnected( Manual );			// don't reconnect
-	    myself()->setOnlineStatus( m_protocol->WebqqOffline);
-	    message = i18n( "Unknown error!");
-	    KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-            return;
+        {
+            /*this is very ugly, since we need user to reinput verfy code*/
+            lc->vc = NULL;
+            message = i18n( "Verify Code Error!");
+            KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+            //KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
+        }
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        disconnected( Manual );			// don't reconnect
+        return;
+    case LWQQ_EC_LOGIN_ABNORMAL:
+        disconnected( Manual );			// don't reconnect
+        message = i18n( "Login Abnormal!");
+        KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        return ;
+    case LWQQ_EC_NETWORK_ERROR:
+        disconnected( Manual );			// don't reconnect
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        message = i18n( "Network error!");
+        KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+        return;
+    default:
+        kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
+        disconnected( Manual );			// don't reconnect
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        message = i18n( "Unknown error!");
+        KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+        return;
     }
 
 
@@ -1323,17 +1270,6 @@ void WebqqAccount::ac_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
 
 void WebqqAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
 {
-
-  //printf("[%s] buddy's qq number: %s, \n", __FUNCTION__, buddy->qqnumber);
-
-    
-#if 0   
-    qq_account* ac = lwqq_client_userdata(lc);
-    ac->disable_send_server = 1;
-    PurpleAccount* account=ac->account;
-    PurpleBuddy* bu = NULL;
- #endif
-    Kopete::Group group;
     LwqqFriendCategory* cate;
     int cate_index = buddy->cate_index;
     QString categoryName;
@@ -1408,45 +1344,6 @@ void WebqqAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
     }
 
     addContact( QString(buddy->qqnumber), displayName,  targetGroup, Kopete::Account::ChangeKABC );
-    
-//    QByteArray data;
-//    data.clear();
-//    addedContact->setDisplayPicture(data);
-#if 0
-    const char* key = try_get(buddy->qqnumber,buddy->uin);
-    const char* disp = try_get(buddy->markname,buddy->nick);
-    bu = purple_find_buddy(account,key);
-    if(bu == NULL) {
-        bu = purple_buddy_new(ac->account,key,(buddy->markname)?buddy->markname:buddy->nick);
-        purple_blist_add_buddy(bu,NULL,group,NULL);
-        //if there isn't a qqnumber we shouldn't save it.
-        if(!buddy->qqnumber) 
-	  purple_blist_node_set_flags(PURPLE_BLIST_NODE(bu),PURPLE_BLIST_NODE_FLAG_NO_SAVE);
-    }
-    purple_buddy_set_protocol_data(bu, buddy);
-    buddy->data = bu;
-    if(purple_buddy_get_group(bu)!=group&&strcmp(purple_buddy_get_group(bu)->name,ac->recent_group_name)!=0) 
-        purple_blist_add_buddy(bu,NULL,group,NULL);
-    if(!bu->alias || strcmp(bu->alias,disp)!=0 )
-        purple_blist_alias_buddy(bu,disp);
-    if(buddy->stat){
-        purple_prpl_got_user_status(account, key, buddy_status(buddy), NULL);
-    }
-    //this is avaliable when reload avatar in
-    //login_stage_f
-    if(buddy->avatar_len)
-        friend_avatar(ac, buddy);
-    //download avatar 
-    PurpleBuddyIcon* icon;
-    if((icon = purple_buddy_icons_find(account,key))==0) {
-        LwqqAsyncEvent* ev = lwqq_info_get_friend_avatar(lc,buddy);
-        lwqq_async_add_event_listener(ev,_C_(2p,friend_avatar,ac,buddy));
-    }
-
-    qq_account_insert_index_node(ac, buddy,NULL);
-
-    ac->disable_send_server = 0;
-#endif
   
 }
 
@@ -1482,9 +1379,6 @@ WebqqContact *WebqqAccount::contact(const QString &id)
 
 void WebqqAccount::group_come(LwqqClient* lc,LwqqGroup* group)
 {
-
-  //printf("group info:\t\t type: %d\t\t name: %s\t\t markname: %s\n", group->type, group->name, group->markname);
-
     QString categoryName;
     MsgDataList msgList;
     msgList.clear();
@@ -2274,19 +2168,10 @@ static void friends_valid_hash(LwqqAsyncEvent* ev,LwqqHashFunc last_hash)
     if(ev->result == LWQQ_EC_HASH_WRONG){
         if(last_hash == hash_with_local_file){
             get_friends_info_retry(lc, hash_with_remote_file);
-        }else{
-	  /*
-            purple_connection_error_reason(ac->gc, 
-                    PURPLE_CONNECTION_ERROR_OTHER_ERROR, 
-                    _("Hash Function Wrong, WebQQ Protocol update"));*/
         }
         return;
     }
     if(ev->result != LWQQ_EC_OK){
-      /*
-        purple_connection_error_reason(ac->gc, 
-                PURPLE_CONNECTION_ERROR_NETWORK_ERROR, 
-                _("Get Friend List Failed"));*/
         return;
     }
     LwqqAsyncEvent* event;
@@ -2334,7 +2219,6 @@ static void add_friend_receipt(LwqqAsyncEvent* ev)
     LwqqClient* lc = ev->lc;
     if(err == 6 ){
         cb_show_messageBox(MSG_ERROR, s_strdup("Error Message"), s_strdup("ErrCode:6\nPlease try agagin later\n"));
-        //purple_notify_message(ac->gc,PURPLE_NOTIFY_MSG_INFO,_("Error Message"),_("ErrCode:6\nPlease try agagin later\n"),NULL,NULL,NULL);
     }
 }
 
@@ -2421,12 +2305,10 @@ static void system_message(LwqqClient* lc,LwqqMsgSystem* system,LwqqBuddy* buddy
 
     } else if(system->type == LwqqMsgSystem::VERIFY_PASS_ADD) {
         snprintf(buf1,sizeof(buf1),_("%s accept your request,and add back you as friend too"),system->account);
-        //purple_notify_message(ac->gc,PURPLE_NOTIFY_MSG_INFO,_("System Message"),_("Add Friend"),buf1,NULL,NULL);
         cb_show_messageBox(MSG_ADD, s_strdup("Add Friend"), s_strdup(buf1));
     } else if(system->type == LwqqMsgSystem::VERIFY_PASS) {
         snprintf(buf1,sizeof(buf1),_("%s accept your request"),system->account);
         cb_show_messageBox(MSG_INFO, s_strdup("Add Friend"), s_strdup(buf1));
-        //purple_notify_message(ac->gc,PURPLE_NOTIFY_MSG_INFO,_("System Message"),_("Add Friend"),buf1,NULL,NULL);
     }
 }
 
