@@ -18,7 +18,7 @@
 #define INST_PREFIX "/usr"
 #endif
 
-#define FACE_DIR INST_PREFIX"/share/pixmaps/pidgin/emotes/webqq/"
+#define FACE_DIR INST_PREFIX"/share/pixmaps/pidgin/emotes/qq/"
 //static GHashTable* smily_hash;
 static TRex* _regex;
 static TRex* hs_regex;

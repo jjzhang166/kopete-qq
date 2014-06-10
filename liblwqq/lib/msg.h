@@ -99,7 +99,7 @@ typedef struct LwqqMsgContent {
     union {
         int face;
         char *str;
-        //webqq protocol
+        //qq protocol
         //this used in offpic format which may replaced by cface (custom face)
         struct {
             char* name;

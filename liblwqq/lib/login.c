@@ -32,7 +32,7 @@
 #include "utility.h"
 #include "internal.h"
 
-/* URL for webqq login */
+/* URL for qq login */
 #define APPID "1003903"
 
 
@@ -65,7 +65,7 @@ static LwqqAsyncEvent* get_login_sig(LwqqClient* lc)
 {
     char url[512];
     snprintf(url,sizeof(url),WEBQQ_LOGIN_UI_HOST"/cgi-bin/login"
-            "?daid=164&target=self&style=5&mibao_css=m_webqq&appid=1003903"
+            "?daid=164&target=self&style=5&mibao_css=m_qq&appid=1003903"
             "&enable_qlogin=0&s_url=http%%3A%%2F%%2Fweb2.qq.com%%2Floginproxy.html"
             );
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
@@ -184,7 +184,7 @@ static void upcase_string(char *str, int len)
 /**
  * I hacked the javascript file named comm.js, which received from tencent
  * server, and find that fuck tencent has changed encryption algorithm
- * for password in webqq3 . The new algorithm is below(descripted with javascript):
+ * for password in qq3 . The new algorithm is below(descripted with javascript):
  * var M=C.p.value; // M is the qq password 
  * var I=hexchar2bin(md5(M)); // Make a md5 digest
  * var H=md5(I+pt.uin); // Make md5 with I and uin(see below)
@@ -267,11 +267,11 @@ static LwqqAsyncEvent* do_login(LwqqClient *lc, const char *md5, LwqqErrorCode *
     
     snprintf(url, sizeof(url), WEBQQ_LOGIN_HOST"/login?"
             "u=%s&p=%s&verifycode=%s&"
-             "webqq_type=%d&remember_uin=1&aid=1003903&login2qq=1&"
+             "qq_type=%d&remember_uin=1&aid=1003903&login2qq=1&"
              "u1=http%%3A%%2F%%2Fweb.qq.com%%2Floginproxy.html"
-             "%%3Flogin2qq%%3D1%%26webqq_type%%3D10&h=1&ptredirect=0&"
+             "%%3Flogin2qq%%3D1%%26qq_type%%3D10&h=1&ptredirect=0&"
              "ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&"
-             "action=2-10-5837&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10034&login_sig=%s",
+             "action=2-10-5837&mibao_css=m_qq&t=1&g=1&js_type=0&js_ver=10034&login_sig=%s",
              lc->username, md5, lc->vc->str,lc->stat,lc->login_sig);
     req = lwqq_http_create_default_request(lc,url, err);
     /* Setup http header */
@@ -410,7 +410,7 @@ LwqqAsyncEvent* lwqq_get_version(LwqqClient *lc, LwqqErrorCode *err)
     lwqq_http_set_option(req, LWQQ_HTTP_ALL_TIMEOUT,5L);
 
     /* Send request */
-    lwqq_log(LOG_DEBUG, "Get webqq version from %s\n", WEBQQ_VERSION_URL);
+    lwqq_log(LOG_DEBUG, "Get qq version from %s\n", WEBQQ_VERSION_URL);
     return  req->do_request_async(req, lwqq__hasnot_post(),_C_(p_i,get_version_back,req));
 }
 static int get_version_back(LwqqHttpRequest* req)
@@ -494,17 +494,17 @@ static LwqqAsyncEvent* set_online_status(LwqqClient *lc,const char *status)
         lwqq_log(LOG_ERROR, "Generate clientid error\n");
         return NULL;
     }
-    char* ptwebqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptwebqq");
+    char* ptqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptqq");
 
-    snprintf(msg, sizeof(msg), "{\"status\":\"%s\",\"ptwebqq\":\"%s\","
+    snprintf(msg, sizeof(msg), "{\"status\":\"%s\",\"ptqq\":\"%s\","
              "\"passwd_sig\":""\"\",\"clientid\":\"%s\""
              ", \"psessionid\":null}"
-             ,status, ptwebqq
+             ,status, ptqq
              ,lc->clientid);
     buf = url_encode(msg);
     snprintf(msg, sizeof(msg), "r=%s", buf);
     s_free(buf);
-    s_free(ptwebqq);
+    s_free(ptqq);
 
     /* Create a POST request */
 	char url[512] ={0};
@@ -534,7 +534,7 @@ static int set_online_status_back(LwqqHttpRequest* req)
         lwqq_override(lc->index,lwqq__json_get_value(result,"index"));
         lwqq_override(lc->port,lwqq__json_get_value(result,"port"));
         lwqq_override(lc->psessionid,lwqq__json_get_value(result,"psessionid"));
-        lwqq_override(lc->vfwebqq,lwqq__json_get_value(result,"vfwebqq"));
+        lwqq_override(lc->vfqq,lwqq__json_get_value(result,"vfqq"));
         lc->stat = lwqq_status_from_str(json_parse_simple_value(result, "status"));
     }
 done:
@@ -546,7 +546,7 @@ done:
 /** 
  * WebQQ login function
  * Step:
- * 1. Get webqq version
+ * 1. Get qq version
  * 2. Get verify code
  * 3. Calculate password's md5
  * 4. Do real login 
@@ -570,7 +570,7 @@ void lwqq_login(LwqqClient *client, LwqqStatus status,LwqqErrorCode *err)
 
 	client->args->login_ec = LWQQ_EC_NO_RESULT;
 	vp_do_repeat(client->events->start_login, NULL);
-    /* optional: get webqq version */
+    /* optional: get qq version */
     //get_version(client, err);
     if(!client->vc){
         LwqqAsyncEvent* ev = get_login_sig(client);
@@ -777,7 +777,7 @@ done:
 static int process_login2(LwqqHttpRequest* req)
 {
     /*
-     * {"retcode":0,"result":{"uin":2501542492,"cip":3396791469,"index":1075,"port":49648,"status":"online","vfwebqq":"8e6abfdb20f9436be07e652397a1197553f49fabd3e67fc88ad7ee4de763f337e120fdf7036176c9","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133392e372e31363000003bce00000f8a026e04005c821a956d0000000a407646664c41737a42416d000000288e6abfdb20f9436be07e652397a1197553f49fabd3e67fc88ad7ee4de763f337e120fdf7036176c9","user_state":0,"f":0}}
+     * {"retcode":0,"result":{"uin":2501542492,"cip":3396791469,"index":1075,"port":49648,"status":"online","vfqq":"8e6abfdb20f9436be07e652397a1197553f49fabd3e67fc88ad7ee4de763f337e120fdf7036176c9","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133392e372e31363000003bce00000f8a026e04005c821a956d0000000a407646664c41737a42416d000000288e6abfdb20f9436be07e652397a1197553f49fabd3e67fc88ad7ee4de763f337e120fdf7036176c9","user_state":0,"f":0}}
      */
     int err = 0;
     LwqqClient* lc = req->lc;
@@ -809,7 +809,7 @@ static int process_login2(LwqqHttpRequest* req)
         lwqq_override(lc->index,lwqq__json_get_value(result,"index"));
         lwqq_override(lc->port,lwqq__json_get_value(result,"port"));
         lwqq_override(lc->psessionid,lwqq__json_get_value(result,"psessionid"));
-        lwqq_override(lc->vfwebqq,lwqq__json_get_value(result,"vfwebqq"));
+        lwqq_override(lc->vfqq,lwqq__json_get_value(result,"vfqq"));
         lc->stat = lwqq_status_from_str(json_parse_simple_value(result, "status"));
     }
 done:
@@ -823,14 +823,14 @@ LwqqAsyncEvent* lwqq_relink(LwqqClient* lc)
     if(!lc) return NULL;
     char url[128];
     char post[512];
-    if(!lc->new_ptwebqq){
-        lc->new_ptwebqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptwebqq");
+    if(!lc->new_ptqq){
+        lc->new_ptqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptqq");
     }
     snprintf(url, sizeof(url), "%s/channel/login2",WEBQQ_D_HOST);
-    snprintf(post, sizeof(post), "r={\"status\":\"%s\",\"ptwebqq\":\"%s\",\"passwd_sig\":\"\",\"clientid\":\"%s\",\"psessionid\":\"%s\"}",lwqq_status_to_str(lc->stat),lc->new_ptwebqq,lc->clientid,lc->psessionid);
+    snprintf(post, sizeof(post), "r={\"status\":\"%s\",\"ptqq\":\"%s\",\"passwd_sig\":\"\",\"clientid\":\"%s\",\"psessionid\":\"%s\"}",lwqq_status_to_str(lc->stat),lc->new_ptqq,lc->clientid,lc->psessionid);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_D_REF_URL);
-    lwqq_http_set_cookie(req, "ptwebqq", lc->new_ptwebqq);
+    lwqq_http_set_cookie(req, "ptqq", lc->new_ptqq);
     req->retry = 0;
     return req->do_request_async(req,lwqq__has_post(),_C_(p_i,process_login2,req));
 }

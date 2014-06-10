@@ -14,7 +14,7 @@
 #include "type.h"
 #include "msg.h"
 
-typedef char* (*LwqqHashFunc)(const char* uin,const char* ptwebqq,void* userdata);
+typedef char* (*LwqqHashFunc)(const char* uin,const char* ptqq,void* userdata);
 /** change discu member operation structure */
 typedef struct LwqqDiscuMemChange LwqqDiscuMemChange;
 /**群名片*/
@@ -62,7 +62,7 @@ LwqqAsyncEvent* lwqq_info_get_discu_name_list(LwqqClient* lc);
 /** 
  * Get detail information of QQ friend(NB: include myself)
  * QQ server need us to pass param like:
- * tuin=244569070&verifysession=&code=&vfwebqq=e64da25c140c66
+ * tuin=244569070&verifysession=&code=&vfqq=e64da25c140c66
  * 
  * @param lc 
  * @param buddy 

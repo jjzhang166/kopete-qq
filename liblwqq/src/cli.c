@@ -212,7 +212,7 @@ static void cli_logout(LwqqClient *lc)
 static void usage()
 {
     fprintf(stdout, "Usage: lwqq-cli [options]...\n"
-            "lwqq-cli: A qq client based on gtk+ uses webqq protocol\n"
+            "lwqq-cli: A qq client based on gtk+ uses qq protocol\n"
             "  -v, --version\n"
             "      Show version of program\n"
             "  -u, --user\n"

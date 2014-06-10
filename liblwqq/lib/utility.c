@@ -63,13 +63,13 @@ const char* lwqq_util_mapto_str(const struct LwqqTypeMap* maps,int type)
 }
 
 
-char* lwqq_util_hashN(const char* uin,const char* ptwebqq,void* unused)
+char* lwqq_util_hashN(const char* uin,const char* ptqq,void* unused)
 {
     int alen=strlen(uin);
     int *c = malloc(sizeof(int)*strlen(uin));
     int d,b,k,clen;
-    int elen=strlen(ptwebqq);
-    const char* e = ptwebqq;
+    int elen=strlen(ptqq);
+    const char* e = ptqq;
     int h;
     int i;
     for(d=0;d<alen;d++){
@@ -105,11 +105,11 @@ char* lwqq_util_hashN(const char* uin,const char* ptwebqq,void* unused)
     free(c);
     return ret;
 }
-char* lwqq_util_hashO(const char* uin,const char* ptwebqq,void* unused)
+char* lwqq_util_hashO(const char* uin,const char* ptqq,void* unused)
 {
-    char* a = s_malloc0(strlen(ptwebqq)+strlen("password error")+3);
+    char* a = s_malloc0(strlen(ptqq)+strlen("password error")+3);
     const char* b = uin;
-    strcat(strcpy(a,ptwebqq),"password error");
+    strcat(strcpy(a,ptqq),"password error");
     size_t alen = strlen(a);
     char* s = s_malloc0(2048);
     int *j = malloc(sizeof(int)*alen);
@@ -135,7 +135,7 @@ char* lwqq_util_hashO(const char* uin,const char* ptwebqq,void* unused)
     s_free(j);
     return s;
 }
-char* lwqq_util_hashP(const char* uin,const char* ptwebqq,void* unused)
+char* lwqq_util_hashP(const char* uin,const char* ptqq,void* unused)
 {
     char a[4]={0};
     int i;
@@ -144,8 +144,8 @@ char* lwqq_util_hashP(const char* uin,const char* ptwebqq,void* unused)
 #else
 	unsigned long long uin_n = strtoull(uin,NULL,10);
 #endif
-    for(i=0;i<strlen(ptwebqq);i++)
-        a[i%4] ^= ptwebqq[i];
+    for(i=0;i<strlen(ptqq);i++)
+        a[i%4] ^= ptqq[i];
     char* j[] = {"EC","OK"};
     char d[4];
     d[0] = (uin_n >>24 & 255) ^ j[0][0];
@@ -167,7 +167,7 @@ struct hash_slice{
 	int s;
 	int e;
 };
-char* lwqq_util_hashQ(const char* uin,const char* ptwebqq,void* _unused)
+char* lwqq_util_hashQ(const char* uin,const char* ptqq,void* _unused)
 {
 	int r[4];
 #ifdef WIN32
@@ -179,7 +179,7 @@ char* lwqq_util_hashQ(const char* uin,const char* ptwebqq,void* _unused)
 	r[1] = uin_n>>16&255;
 	r[2] = uin_n>>8&255;
 	r[3] = uin_n&255;
-	char* j = s_strdup(ptwebqq);
+	char* j = s_strdup(ptqq);
 	struct hash_slice e_ins;
 	struct hash_slice e[1024];
 	int e_idx = 0;

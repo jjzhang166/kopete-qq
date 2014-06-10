@@ -79,7 +79,7 @@ void lwqq_js_unload(lwqq_js_t* js,lwqq_jso_t* obj)
     //JS_DecompileScriptObject(js->context, obj, <#const char *name#>, <#uintN indent#>);
 }
 
-char* lwqq_js_hash(const char* uin,const char* ptwebqq,lwqq_js_t* js)
+char* lwqq_js_hash(const char* uin,const char* ptqq,lwqq_js_t* js)
 {
     JSObject* global = JS_GetGlobalObject(js->context);
     jsval res;
@@ -87,9 +87,9 @@ char* lwqq_js_hash(const char* uin,const char* ptwebqq,lwqq_js_t* js)
     char* res_;
 
     JSString* uin_ = JS_NewStringCopyZ(js->context, uin);
-    JSString* ptwebqq_ = JS_NewStringCopyZ(js->context, ptwebqq);
+    JSString* ptqq_ = JS_NewStringCopyZ(js->context, ptqq);
     argv[0] = STRING_TO_JSVAL(uin_);
-    argv[1] = STRING_TO_JSVAL(ptwebqq_);
+    argv[1] = STRING_TO_JSVAL(ptqq_);
     JS_CallFunctionName(js->context, global, "P", 2, argv, &res);
 
     res_ = JS_EncodeString(js->context,JSVAL_TO_STRING(res));
@@ -110,8 +110,8 @@ static void hash_func(char** result,LwqqClient* lc,LwjsPlugin* pl)
 {
 	s_free(*result);
 	const char* uin = lc->myself->uin;
-	const char* ptwebqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptwebqq");
-	char* res = lwqq_js_hash(uin, ptwebqq, pl->js);
+	const char* ptqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptqq");
+	char* res = lwqq_js_hash(uin, ptqq, pl->js);
 	*result = res;
 }
 

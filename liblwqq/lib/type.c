@@ -183,9 +183,9 @@ void lwqq_client_free(LwqqClient *client)
     s_free(client->cip);
     s_free(client->index);
     s_free(client->port);
-    s_free(client->vfwebqq);
+    s_free(client->vfqq);
     s_free(client->psessionid);
-    s_free(client->new_ptwebqq);
+    s_free(client->new_ptqq);
     s_free(client->login_sig);
     lwqq_buddy_free(client->myself);
 

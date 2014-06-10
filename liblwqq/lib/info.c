@@ -782,15 +782,15 @@ LwqqAsyncEvent* lwqq_info_get_friends_info(LwqqClient *lc, LwqqHashFunc hash, vo
     LwqqHttpRequest *req = NULL;
     if(hash == NULL)  hash = lwqq_util_hashP;
 
-    char* ptwebqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptwebqq");
-    char* h = hash(lc->myself->uin, ptwebqq,userdata);
+    char* ptqq = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "ptqq");
+    char* h = hash(lc->myself->uin, ptqq,userdata);
 	vp_do_repeat(lc->events->hash_func, NULL);
     if(h == NULL) 
         // hash failed, fake it with empty and wait for server error return.
         h = s_strdup("");
-    s_free(ptwebqq);
-    /* Create post data: {"h":"hello","vfwebqq":"4354j53h45j34"} */
-    snprintf(post, sizeof(post), "r={\"h\":\"hello\",\"hash\":\"%s\",\"vfwebqq\":\"%s\"}",h,lc->vfwebqq);
+    s_free(ptqq);
+    /* Create post data: {"h":"hello","vfqq":"4354j53h45j34"} */
+    snprintf(post, sizeof(post), "r={\"h\":\"hello\",\"hash\":\"%s\",\"vfqq\":\"%s\"}",h,lc->vfqq);
     s_free(h);
 
     /* Create a POST request */
@@ -888,10 +888,10 @@ LwqqAsyncEvent* lwqq_info_get_avatar(LwqqClient* lc,LwqqBuddy* buddy,LwqqGroup* 
     snprintf(host,sizeof(host),"face%d.web.qq.com",++serv_id);
     serv_id %= 10;
     snprintf(url, sizeof(url),
-             "http://%s/cgi/svr/face/getface?cache=0&type=%d&fid=0&uin=%s&vfwebqq=%s",
-             host,type,uin, lc->vfwebqq);
+             "http://%s/cgi/svr/face/getface?cache=0&type=%d&fid=0&uin=%s&vfqq=%s",
+             host,type,uin, lc->vfqq);
     req = lwqq_http_create_default_request(lc,url, &error);
-    req->set_header(req, "Referer", "http://web2.qq.com/webqq.html");
+    req->set_header(req, "Referer", "http://web2.qq.com/qq.html");
     req->set_header(req,"Host",host);
 
     return req->do_request_async(req, lwqq__hasnot_post(),_C_(3p_i,get_avatar_back,req,buddy,group));
@@ -1063,8 +1063,8 @@ LwqqAsyncEvent* lwqq_info_get_group_name_list(LwqqClient *lc, LwqqErrorCode *err
 
     const char* url =  WEBQQ_S_HOST"/api/get_group_name_list_mask2";
     /* Create a POST request */
-    /* Create post data: {"h":"hello","vfwebqq":"4354j53h45j34"} */
-	snprintf(post, sizeof(post), "r={\"vfwebqq\":\"%s\"}",lc->vfwebqq);
+    /* Create post data: {"h":"hello","vfqq":"4354j53h45j34"} */
+	snprintf(post, sizeof(post), "r={\"vfqq\":\"%s\"}",lc->vfqq);
 	char* upost = url_encode(post+2);
 	strcpy(post+2, upost);
 	s_free(upost);
@@ -1140,10 +1140,10 @@ LwqqAsyncEvent* lwqq_info_get_discu_name_list(LwqqClient* lc)
     if(!lc) return NULL;
 
     char url[512];
-    /*snprintf(url,sizeof(url),WEBQQ_D_HOST"/channel/get_discu_list_new2?clientid=%s&psessionid=%s&vfwebqq=%s&t=%ld",
-            lc->clientid,lc->psessionid,lc->vfwebqq,time(NULL));*/
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_discus_list?clientid=%s&psessionid=%s&vfwebqq=%s&t=%lu",
-            lc->clientid,lc->psessionid,lc->vfwebqq,LTIME);
+    /*snprintf(url,sizeof(url),WEBQQ_D_HOST"/channel/get_discu_list_new2?clientid=%s&psessionid=%s&vfqq=%s&t=%ld",
+            lc->clientid,lc->psessionid,lc->vfqq,time(NULL));*/
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_discus_list?clientid=%s&psessionid=%s&vfqq=%s&t=%lu",
+            lc->clientid,lc->psessionid,lc->vfqq,LTIME);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
     
@@ -1423,8 +1423,8 @@ LwqqAsyncEvent* lwqq_info_get_group_detail_info(LwqqClient *lc, LwqqGroup *group
 
         /* Create a GET request */
         snprintf(url, sizeof(url),
-                WEBQQ_S_HOST"/api/get_group_info_ext2?gcode=%s&cb=undefined&vfwebqq=%s&t=%ld",
-                group->code, lc->vfwebqq,time(NULL));
+                WEBQQ_S_HOST"/api/get_group_info_ext2?gcode=%s&cb=undefined&vfqq=%s&t=%ld",
+                group->code, lc->vfqq,time(NULL));
         req = lwqq_http_create_default_request(lc,url, err);
         req->set_header(req, "Referer", WEBQQ_S_REF_URL);
 
@@ -1613,8 +1613,8 @@ LwqqAsyncEvent* lwqq_info_get_qqnumber(LwqqClient* lc,const char* uin_gcode,char
     char url[512];
     LwqqHttpRequest *req = NULL;
     snprintf(url, sizeof(url),
-             WEBQQ_S_HOST"/api/get_friend_uin2?tuin=%s&verifysession=&type=1&code=&vfwebqq=%s&t=%ld",
-             uin_gcode, lc->vfwebqq,time(NULL));
+             WEBQQ_S_HOST"/api/get_friend_uin2?tuin=%s&verifysession=&type=1&code=&vfqq=%s&t=%ld",
+             uin_gcode, lc->vfqq,time(NULL));
     req = lwqq_http_create_default_request(lc,url, NULL);
     req->set_header(req, "Referer", WEBQQ_S_REF_URL);
 
@@ -1624,7 +1624,7 @@ LwqqAsyncEvent* lwqq_info_get_qqnumber(LwqqClient* lc,const char* uin_gcode,char
 /**
  * Get detail information of QQ friend(NB: include myself)
  * QQ server need us to pass param like:
- * tuin=244569070&verifysession=&code=&vfwebqq=e64da25c140c66
+ * tuin=244569070&verifysession=&code=&vfqq=e64da25c140c66
  *
  * @param lc
  * @param buddy
@@ -1646,8 +1646,8 @@ LwqqAsyncEvent* lwqq_info_get_friend_detail_info(LwqqClient *lc, LwqqBuddy *budd
 
     /* Create a GET request */
     snprintf(url, sizeof(url),
-             WEBQQ_S_HOST"/api/get_friend_info2?tuin=%s&verifysession=&code=&vfwebqq=%s",
-             buddy->uin, lc->vfwebqq);
+             WEBQQ_S_HOST"/api/get_friend_info2?tuin=%s&verifysession=&code=&vfqq=%s",
+             buddy->uin, lc->vfqq);
     req = lwqq_http_create_default_request(lc,url, NULL);
     req->set_header(req, "Referer", WEBQQ_S_REF_URL);
     req->set_header(req, "Content-Transfer-Encoding", "binary");
@@ -1696,8 +1696,8 @@ LwqqAsyncEvent* lwqq_info_change_buddy_markname(LwqqClient* lc,LwqqBuddy* buddy,
     char post[256];
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/change_mark_name2");
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
-    snprintf(post,sizeof(post),"tuin=%s&markname=%s&vfwebqq=%s",
-            buddy->uin,alias,lc->vfwebqq);
+    snprintf(post,sizeof(post),"tuin=%s&markname=%s&vfqq=%s",
+            buddy->uin,alias,lc->vfqq);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
     LwqqAsyncEvent* ev = req->do_request_async(req,lwqq__has_post(),_C_(p_i,process_simple_response,req));
@@ -1712,8 +1712,8 @@ LwqqAsyncEvent* lwqq_info_change_group_markname(LwqqClient* lc,LwqqGroup* group,
     char post[256];
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/update_group_info2");
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
-    snprintf(post,sizeof(post),"r={\"gcode\":%s,\"markname\":\"%s\",\"vfwebqq\":\"%s\"}",
-            group->code,alias,lc->vfwebqq);
+    snprintf(post,sizeof(post),"r={\"gcode\":%s,\"markname\":\"%s\",\"vfqq\":\"%s\"}",
+            group->code,alias,lc->vfqq);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
     LwqqAsyncEvent* ev;
 
@@ -1729,8 +1729,8 @@ LwqqAsyncEvent* lwqq_info_change_discu_topic(LwqqClient* lc,LwqqGroup* group,con
     char post[512];
     snprintf(url,sizeof(url),"%s/channel/modify_discu_info",WEBQQ_D_HOST);
     snprintf(post,sizeof(post),"r={\"did\":\"%s\",\"discu_name\":\"%s\","
-            "\"dtype\":1,\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfwebqq\":\"%s\"}",
-            group->did,alias,lc->clientid,lc->psessionid,lc->vfwebqq);
+            "\"dtype\":1,\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfqq\":\"%s\"}",
+            group->did,alias,lc->clientid,lc->psessionid,lc->vfqq);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
     lwqq_puts(group->account);
     req->set_header(req,"Referer",WEBQQ_D_REF_URL);
@@ -1758,8 +1758,8 @@ LwqqAsyncEvent* lwqq_info_modify_buddy_category(LwqqClient* lc,LwqqBuddy* buddy,
     char post[256];
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/modify_friend_group");
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
-    snprintf(post,sizeof(post),"tuin=%s&newid=%d&vfwebqq=%s",
-            buddy->uin,cate_idx,lc->vfwebqq );
+    snprintf(post,sizeof(post),"tuin=%s&newid=%d&vfqq=%s",
+            buddy->uin,cate_idx,lc->vfqq );
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
     LwqqAsyncEvent* ev;
@@ -1775,8 +1775,8 @@ LwqqAsyncEvent* lwqq_info_delete_friend(LwqqClient* lc,LwqqBuddy* buddy,LwqqDelF
     char post[256];
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/delete_friend");
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
-    snprintf(post,sizeof(post),"tuin=%s&delType=%d&vfwebqq=%s",
-            buddy->uin,del_type,lc->vfwebqq );
+    snprintf(post,sizeof(post),"tuin=%s&delType=%d&vfqq=%s",
+            buddy->uin,del_type,lc->vfqq );
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
     LwqqAsyncEvent* ev;
@@ -1793,18 +1793,18 @@ LwqqAsyncEvent* lwqq_info_answer_request_friend(LwqqClient* lc,const char* qq,Lw
     switch(allow){
         case LWQQ_NO:
             snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/deny_added_request2");
-            snprintf(post,sizeof(post),"r={\"account\":%s,\"vfwebqq\":\"%s\",\"msg\":\"%s\"}",
-                    qq,lc->vfwebqq,extra?extra:"");
+            snprintf(post,sizeof(post),"r={\"account\":%s,\"vfqq\":\"%s\",\"msg\":\"%s\"}",
+                    qq,lc->vfqq,extra?extra:"");
         break;
         case LWQQ_YES:
             snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/allow_added_request2");
-            snprintf(post,sizeof(post),"r={\"account\":%s,\"vfwebqq\":\"%s\"}",
-                    qq,lc->vfwebqq );
+            snprintf(post,sizeof(post),"r={\"account\":%s,\"vfqq\":\"%s\"}",
+                    qq,lc->vfqq );
         break;
         case LWQQ_ALLOW_AND_ADD:
             snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/allow_and_add2");
-            snprintf(post,sizeof(post),"r={\"account\":%s,\"gid\":0,\"vfwebqq\":\"%s\"",
-                    qq,lc->vfwebqq);
+            snprintf(post,sizeof(post),"r={\"account\":%s,\"gid\":0,\"vfqq\":\"%s\"",
+                    qq,lc->vfqq);
             if(extra)
                 format_append(post,",\"mname\",\"%s\"",extra);
             strcat(post,"}");
@@ -1870,8 +1870,8 @@ static void add_friend_stage_2(LwqqAsyncEvent* called,LwqqVerifyCode* code,char*
     uin = url_encode(qq_email);
     LwqqClient* lc = called->lc;
     char *verifysession = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "verifysession");
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/search_qq_by_uin2?tuin=%s&verifysession=%s&code=%s&vfwebqq=%s&t=%ld",
-            uin,verifysession,code->str,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/search_qq_by_uin2?tuin=%s&verifysession=%s&code=%s&vfqq=%s&t=%ld",
+            uin,verifysession,code->str,lc->vfqq,time(NULL));
     s_free(verifysession);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
@@ -1906,12 +1906,12 @@ LwqqAsyncEvent* lwqq_info_add_friend(LwqqClient* lc,LwqqBuddy* buddy,const char*
     if(buddy->allow&&s_atoi(buddy->allow,0)==0){
         snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/add_no_verify2");
         snprintf(post, sizeof(post), "r={\"account\":%s,\"myallow\":1,"
-                "\"groupid\":%d,\"mname\":\"%s\",\"token\":\"%s\",\"vfwebqq\":\"%s\"}",buddy->qqnumber,buddy->cate_index,message,buddy->token,lc->vfwebqq);
+                "\"groupid\":%d,\"mname\":\"%s\",\"token\":\"%s\",\"vfqq\":\"%s\"}",buddy->qqnumber,buddy->cate_index,message,buddy->token,lc->vfqq);
     }else{
         snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/add_need_verify2");
         snprintf(post,sizeof(post),"r={\"account\":%s,\"myallow\":1,"
                 "\"groupid\":%d,\"msg\":\"%s\","
-                "\"token\":\"%s\",\"vfwebqq\":\"%s\"}",buddy->qqnumber,buddy->cate_index,message,buddy->token,lc->vfwebqq);
+                "\"token\":\"%s\",\"vfqq\":\"%s\"}",buddy->qqnumber,buddy->cate_index,message,buddy->token,lc->vfqq);
     }
 
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
@@ -1942,8 +1942,8 @@ static void add_group_stage_1(LwqqAsyncEvent* called,LwqqVerifyCode* code,LwqqGr
     LwqqClient* lc = called->lc;
     snprintf(url,sizeof(url),
             "http://cgi.web2.qq.com/keycgi/qqweb/group/search.do?"
-            "pg=1&perpage=10&all=%s&c1=0&c2=0&c3=0&st=0&vfcode=%s&type=1&vfwebqq=%s&t=%ld",
-            g->qq,code->str,lc->vfwebqq,time(NULL));
+            "pg=1&perpage=10&all=%s&c1=0&c2=0&c3=0&st=0&vfcode=%s&type=1&vfqq=%s&t=%ld",
+            g->qq,code->str,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc,url,NULL);
     req->set_header(req,"Referer","http://cgi.web2.qq.com/proxy.html?v=20110412001&id=1");
 
@@ -2000,8 +2000,8 @@ static void add_group_stage_4(LwqqAsyncEvent* called,LwqqVerifyCode* c,LwqqGroup
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/apply_join_group2");
     char* verifysession = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "verifysession");
     snprintf(post,sizeof(post),"r={\"gcode\":%s,\"code\":\"%s\",\"vfy\":\"%s\","
-            "\"msg\":\"%s\",\"vfwebqq\":\"%s\"}",
-            g->code,c->str,verifysession,msg,lc->vfwebqq);
+            "\"msg\":\"%s\",\"vfqq\":\"%s\"}",
+            g->code,c->str,verifysession,msg,lc->vfqq);
     s_free(verifysession);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
@@ -2041,7 +2041,7 @@ LwqqAsyncEvent* lwqq_info_mask_group(LwqqClient* lc,LwqqGroup* group,LwqqMask ma
         }
     }
     group->mask = mask_ori;
-    ds_cat(postd,"\"cAll\":0,\"idx\":",lc->index,",\"port\":",lc->port,"}}&vfwebqq=",lc->vfwebqq,NULL);
+    ds_cat(postd,"\"cAll\":0,\"idx\":",lc->index,",\"port\":",lc->port,"}}&vfqq=",lc->vfqq,NULL);
 	post = ds_c_str(postd);
 
 
@@ -2059,7 +2059,7 @@ LwqqAsyncEvent* lwqq_info_get_stranger_info(LwqqClient* lc,const char* serv_id,L
 {
     if(!lc||!serv_id||!out) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_stranger_info2?tuin=%s&verifysession=&gid=0&code=&vfwebqq=%s&t=%ld",serv_id,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_stranger_info2?tuin=%s&verifysession=&gid=0&code=&vfqq=%s&t=%ld",serv_id,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2069,7 +2069,7 @@ LwqqAsyncEvent* lwqq_info_get_stranger_info_by_msg(LwqqClient* lc,LwqqMsgSysGMsg
 {
     if(!lc||!msg||!out) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_stranger_info2?tuin=%s&verifysession=&gid=0&code=%s-%s&vfwebqq=%s&t=%ld",msg->member_uin,"group_request_join",msg->group_uin,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_stranger_info2?tuin=%s&verifysession=&gid=0&code=%s-%s&vfqq=%s&t=%ld",msg->member_uin,"group_request_join",msg->group_uin,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2095,8 +2095,8 @@ LwqqAsyncEvent* lwqq_info_get_group_public_info(LwqqClient* lc,LwqqGroup* g)
     if(!lc||!g) return NULL;
     if(!g->code) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_group_public_info2?gcode=%s&vfwebqq=%s&t=%ld",
-            g->code,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_group_public_info2?gcode=%s&vfqq=%s&t=%ld",
+            g->code,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 	
@@ -2120,8 +2120,8 @@ LwqqAsyncEvent* lwqq_info_get_self_card(LwqqClient* lc,LwqqGroup* g,LwqqBusiness
 {
     if(!lc||!g||!card) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_self_business_card2?gcode=%s&vfwebqq=%s&t=%ld",
-            g->code,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_self_business_card2?gcode=%s&vfqq=%s&t=%ld",
+            g->code,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL"/proxy.html?v=20110412001&id=1");
 
@@ -2140,7 +2140,7 @@ LwqqAsyncEvent* lwqq_info_set_self_card(LwqqClient* lc,LwqqBusinessCard* card)
     if(card->remark) format_append(post,"\"remark\":\"%s\",",card->remark);
     if(card->name) format_append(post,"\"name\":\"%s\",",card->name);
     if(card->gender) format_append(post,"\"name\":\"%d\",",card->gender);
-    format_append(post,"\"vfwebqq\":\"%s\"}",lc->vfwebqq);
+    format_append(post,"\"vfqq\":\"%s\"}",lc->vfqq);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2153,8 +2153,8 @@ LwqqAsyncEvent* lwqq_info_get_single_long_nick(LwqqClient* lc,LwqqBuddy* buddy)
     if(!lc||!buddy||!buddy->uin) return NULL;
     char url[512];
 
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_single_long_nick2?tuin=%s&vfwebqq=%s&t=%ld",
-            buddy->uin,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_single_long_nick2?tuin=%s&vfqq=%s&t=%ld",
+            buddy->uin,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2168,7 +2168,7 @@ LwqqAsyncEvent* lwqq_info_set_self_long_nick(LwqqClient* lc,const char* nick)
     char post[1024];
 
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/set_long_nick2");
-    snprintf(post,sizeof(post),"r={\"nlk\":\"%s\",\"vfwebqq\":\"%s\"}",nick,lc->vfwebqq);
+    snprintf(post,sizeof(post),"r={\"nlk\":\"%s\",\"vfqq\":\"%s\"}",nick,lc->vfqq);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2187,14 +2187,14 @@ LwqqAsyncEvent* lwqq_info_delete_group(LwqqClient* lc,LwqqGroup* group)
     LwqqAsyncEvent* ev;
     if(group->type == LWQQ_GROUP_QUN){
         snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/quit_group2");
-        snprintf(post,sizeof(post),"r={\"gcode\":\"%s\",\"vfwebqq\":\"%s\"}",group->code,lc->vfwebqq);
+        snprintf(post,sizeof(post),"r={\"gcode\":\"%s\",\"vfqq\":\"%s\"}",group->code,lc->vfqq);
         req = lwqq_http_create_default_request(lc, url, NULL);
         req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
         ev = req->do_request_async(req,lwqq__has_post(),_C_(p_i,process_simple_response,req));
     }else{
-        snprintf(url,sizeof(url),"%s/channel/quit_discu?did=%s&clientid=%s&psessionid=%s&vfwebqq=%s&t=%ld",
-                WEBQQ_D_HOST,group->did,lc->clientid,lc->psessionid,lc->vfwebqq,time(NULL));
+        snprintf(url,sizeof(url),"%s/channel/quit_discu?did=%s&clientid=%s&psessionid=%s&vfqq=%s&t=%ld",
+                WEBQQ_D_HOST,group->did,lc->clientid,lc->psessionid,lc->vfqq,time(NULL));
         req = lwqq_http_create_default_request(lc, url, NULL);
         req->set_header(req,"Referer",WEBQQ_D_REF_URL);
         ev = req->do_request_async(req,lwqq__hasnot_post(),_C_(p_i,process_simple_response,req));
@@ -2209,8 +2209,8 @@ LwqqAsyncEvent* lwqq_info_get_group_memo(LwqqClient* lc,LwqqGroup* g)
     char url[512];
 
     snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_group_info?"
-            "retainKey=memo,gid&vfwebqq=%s&t=%ld&gcode=[%s]",
-            lc->vfwebqq,time(NULL),g->code);
+            "retainKey=memo,gid&vfqq=%s&t=%ld&gcode=[%s]",
+            lc->vfqq,time(NULL),g->code);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2223,8 +2223,8 @@ LwqqAsyncEvent* lwqq_info_recent_list(LwqqClient* lc,LwqqRecentList* list)
     char url[512];
     char post[512];
     snprintf(url,sizeof(url),"%s/channel/get_recent_list2",WEBQQ_D_HOST);
-    snprintf(post,sizeof(post),"r={\"vfwebqq\":\"%s\",\"clientid\":\"%s\",\"psessionid\":\"%s\"}",
-            lc->vfwebqq,lc->clientid,lc->psessionid);
+    snprintf(post,sizeof(post),"r={\"vfqq\":\"%s\",\"clientid\":\"%s\",\"psessionid\":\"%s\"}",
+            lc->vfqq,lc->clientid,lc->psessionid);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_D_REF_URL);
 
@@ -2247,7 +2247,7 @@ LwqqAsyncEvent* lwqq_info_get_level(LwqqClient* lc, LwqqBuddy* b)
 {
     if(!lc||!b) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_qq_level2?tuin=%s&vfwebqq=%s&t=%ld",b->uin,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_qq_level2?tuin=%s&vfqq=%s&t=%ld",b->uin,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
 
@@ -2318,8 +2318,8 @@ LwqqAsyncEvent* lwqq_info_change_discu_mem(LwqqClient* lc,LwqqGroup* discu,LwqqD
 
     lwqq_discu_mem_change_to_str(chg, post, sizeof(post)-strlen(post));
     
-    format_append(post,",\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfwebqq\":\"%s\"}",
-            lc->clientid,lc->psessionid,lc->vfwebqq);
+    format_append(post,",\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfqq\":\"%s\"}",
+            lc->clientid,lc->psessionid,lc->vfqq);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_D_REF_URL);
 
@@ -2330,10 +2330,10 @@ LwqqAsyncEvent* lwqq_info_change_discu_mem(LwqqClient* lc,LwqqGroup* discu,LwqqD
 
 static LwqqAsyncEvent* lwqq_info_get_allow_info(LwqqClient* lc,LwqqBuddy* b)
 {
-//http://s.web2.qq.com/api/get_allow_info2?tuin=106017864&retainKey=allow&vfwebqq=561652d029ab3b84cc233b85a15b8f47123d0b4b69e92ba4e0efd4e73d4bc4712ecec28375961d44&t=1365477470708
+//http://s.web2.qq.com/api/get_allow_info2?tuin=106017864&retainKey=allow&vfqq=561652d029ab3b84cc233b85a15b8f47123d0b4b69e92ba4e0efd4e73d4bc4712ecec28375961d44&t=1365477470708
     if(!lc||!b) return NULL;
     char url[512];
-    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_allow_info2?tuin=%s&retainKey=allow&vfwebqq=%s&t=%ld",b->uin,lc->vfwebqq,time(NULL));
+    snprintf(url,sizeof(url),WEBQQ_S_HOST"/api/get_allow_info2?tuin=%s&retainKey=allow&vfqq=%s&t=%ld",b->uin,lc->vfqq,time(NULL));
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_S_REF_URL);
     return req->do_request_async(req,lwqq__hasnot_post(),_C_(3p_i,process_simple_string,req,"allow",&b->allow));
@@ -2384,8 +2384,8 @@ static void create_discu_stage_2(LwqqAsyncEvent* called,LwqqVerifyCode* code,Lwq
     lwqq_discu_mem_change_to_str(chg, post, sizeof(post)-strlen(post));
     
     char* verifysession = lwqq_http_get_cookie(lwqq_get_http_handle(lc), "verifysession");
-    format_append(post,",\"code\":\"%s\",\"verifysession\":\"%s\",\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfwebqq\":\"%s\"}",
-            code->str,verifysession,lc->clientid,lc->psessionid,lc->vfwebqq);
+    format_append(post,",\"code\":\"%s\",\"verifysession\":\"%s\",\"clientid\":\"%s\",\"psessionid\":\"%s\",\"vfqq\":\"%s\"}",
+            code->str,verifysession,lc->clientid,lc->psessionid,lc->vfqq);
     s_free(verifysession);
     LwqqHttpRequest* req = lwqq_http_create_default_request(lc, url, NULL);
     req->set_header(req,"Referer",WEBQQ_D_REF_URL);

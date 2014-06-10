@@ -84,56 +84,56 @@ ${CMAKE_CURRENT_SOURCE_DIR}/liblwqq/lib/
 
 ########### next target ###############
 
-set(kopete_webqq_PART_SRCS 
-   webqqprotocol.cpp 
+set(kopete_qq_PART_SRCS 
+   qqprotocol.cpp 
    qq_types.cpp
-   webqqcontact.cpp 
-   webqqaccount.cpp 
-   webqqaddcontactpage.cpp 
-   webqqeditaccountwidget.cpp 
-   webqqbridgecallback.cpp
-   webqqloginverifywidget.cpp
-   webqquserinfoform.cpp
-   webqqchatsession.cpp
-   webqqdiscuchatsession.cpp
-   webqqgroupchatsession.cpp
-   webqqshowgetinfo.cpp
+   qqcontact.cpp 
+   qqaccount.cpp 
+   qqaddcontactpage.cpp 
+   qqeditaccountwidget.cpp 
+   qqbridgecallback.cpp
+   qqloginverifywidget.cpp
+   qquserinfoform.cpp
+   qqchatsession.cpp
+   qqdiscuchatsession.cpp
+   qqgroupchatsession.cpp
+   qqshowgetinfo.cpp
    js.cpp
    translate.cpp
    trex.cpp
-   ui/webqqwebcamdialog.cpp 
+   ui/qqwebcamdialog.cpp 
 )
 
 
 
-kde4_add_ui_files(kopete_webqq_PART_SRCS
-webqqaddui.ui
+kde4_add_ui_files(kopete_qq_PART_SRCS
+qqaddui.ui
 )
 
-kde4_add_ui_files(kopete_webqq_PART_SRCS
-webqqaccountpreferences.ui
+kde4_add_ui_files(kopete_qq_PART_SRCS
+qqaccountpreferences.ui
 )
 
-kde4_add_ui_files(kopete_webqq_PART_SRCS
-webqquserinfoform.ui
+kde4_add_ui_files(kopete_qq_PART_SRCS
+qquserinfoform.ui
 )
 
-kde4_add_plugin(kopete_webqq ${kopete_webqq_PART_SRCS})
+kde4_add_plugin(kopete_qq ${kopete_qq_PART_SRCS})
 
 
-#target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
-target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
+#target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
+target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
 if(NOT DISABLE_VIDEOSUPPORT)
-  target_link_libraries(kopete_webqq kopete_videodevice)
+  target_link_libraries(kopete_qq kopete_videodevice)
 endif(NOT DISABLE_VIDEOSUPPORT)
 
 #Urgly!!!
 set(PLUGIN_INSTALL_DIR "/usr/lib/kde4/")
 set(SERVICES_INSTALL_DIR "/usr/share/kde4/services/")
  
-install(TARGETS kopete_webqq  DESTINATION ${PLUGIN_INSTALL_DIR})
+install(TARGETS kopete_qq  DESTINATION ${PLUGIN_INSTALL_DIR})
 
 ########### install files ###############
 
-install( FILES kopete_webqq.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
-install( FILES webqqdiscuui.rc webqqchatui.rc webqqgroupui.rc  DESTINATION ${DATA_INSTALL_DIR}/kopete_webqq)
+install( FILES kopete_qq.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install( FILES qqdiscuui.rc qqchatui.rc qqgroupui.rc  DESTINATION ${DATA_INSTALL_DIR}/kopete_qq)

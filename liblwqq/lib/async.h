@@ -35,7 +35,7 @@
  */
 typedef struct LwqqAsyncEvent {
     /** 0 : success
-     *  >0: errno form webqq server
+     *  >0: errno form qq server
      *  <0: errno from lwqq inner
      */
     int result;

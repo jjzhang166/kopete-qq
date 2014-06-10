@@ -58,16 +58,16 @@ void qq_js_unload(qq_js_t* js,qq_jso_t* obj)
     //JS_DecompileScriptObject(js->context, obj, <#const char *name#>, <#uintN indent#>);
 }
 
-char* qq_js_hash(const char* uin,const char* ptwebqq,qq_js_t* js)
+char* qq_js_hash(const char* uin,const char* ptqq,qq_js_t* js)
 {
     JSObject* global = JS_GetGlobalObject(js->context);
     jsval res;
     jsval argv[2];
 
     JSString* uin_ = JS_NewStringCopyZ(js->context, uin);
-    JSString* ptwebqq_ = JS_NewStringCopyZ(js->context, ptwebqq);
+    JSString* ptqq_ = JS_NewStringCopyZ(js->context, ptqq);
     argv[0] = STRING_TO_JSVAL(uin_);
-    argv[1] = STRING_TO_JSVAL(ptwebqq_);
+    argv[1] = STRING_TO_JSVAL(ptqq_);
     JS_CallFunctionName(js->context, global, "P", 2, argv, &res);
 
     JSString* res_ = JS_ValueToString(js->context, res);

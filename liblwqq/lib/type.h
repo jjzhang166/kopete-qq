@@ -141,7 +141,7 @@ typedef enum {
     LWQQ_EC_NO_RESULT        = -2,
     LWQQ_EC_ERROR            = -1,
 
-    //webqq error code
+    //qq error code
     LWQQ_EC_OK               = 0,
     LWQQ_EC_LOGIN_NEED_VC    = 10,
     LWQQ_EC_HASH_WRONG       = 50,
@@ -312,14 +312,14 @@ struct LwqqClient {
     char *cip;
     char *index;
     char *port;
-    char *vfwebqq;
+    char *vfqq;
     char *psessionid;
     const char* last_err;
     char *gface_key;                  /**< use at cface */
     char *gface_sig;                  /**<use at cfage */
     char *login_sig;
     char *error_description;
-    char *new_ptwebqq;              /**< this only used when relogin */
+    char *new_ptqq;              /**< this only used when relogin */
     LwqqBuddy *myself;          /**< Myself */
     LwqqVerifyCode *vc;         /**< Verify Code */
 	struct LwqqEvents * events;
