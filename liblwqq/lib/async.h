@@ -34,16 +34,16 @@
  *            use s_free to free event or evset when necessary
  */
 typedef struct LwqqAsyncEvent {
-    /** 0 : success
-     *  >0: errno form qq server
-     *  <0: errno from lwqq inner
-     */
-    int result;
-    LwqqCallbackCode failcode; ///< would be depreciate
-    LwqqClient* lc;
+	/** 0 : success
+	 *  >0: errno form webqq server
+	 *  <0: errno from lwqq inner
+	 */
+	int result;
+	LwqqCallbackCode failcode; ///< would be depreciate
+	LwqqClient* lc;
 }LwqqAsyncEvent;
 typedef struct LwqqAsyncEvset{
-    int err_count;
+	int err_count;
 }LwqqAsyncEvset;
 /** 
  * create a new evset. 
@@ -89,7 +89,8 @@ void lwqq_async_add_event_listener(LwqqAsyncEvent* event,LwqqCommand cmd);
  *                because evset is create by evset_new, shouldn't be NULL
  *
  *                if evset reference count is zero, evset would automaticly freed
- *                because it never trigger. if not freed now , no chance to free anymore
+ *                because it never trigger. and cmd would immediately executed.
+ *                if not freed now , no chance to free anymore
  * @param cmd   : if evset reference count decreased to zero, cmd would trigger
  */
 void lwqq_async_add_evset_listener(LwqqAsyncEvset* evset,LwqqCommand cmd);
@@ -151,6 +152,7 @@ void lwqq_async_queue_rm(LwqqAsyncQueue* queue,void* func);
  * @see LwqqClient::dispatch
  */
 void lwqq_async_dispatch(LwqqCommand cmd);
+//timeout 0 means a default small delay
 void lwqq_async_dispatch_delay(LwqqCommand cmd,unsigned long timeout);
 //initialize lwqq client with default dispatch function
 void lwqq_async_init(LwqqClient* lc);
@@ -161,11 +163,14 @@ void lwqq_async_init(LwqqClient* lc);
 void lwqq_async_global_quit();
 
 
-//=========================PLUGIN API===========================//
-typedef struct LwqqPlugin{
-	void (*init)(struct LwqqPlugin* pl,LwqqClient* lc);
-	void (*remove)(struct LwqqPlugin* pl,LwqqClient* lc);
-}LwqqPlugin;
+//=========================EXTENSION API===========================//
+typedef struct LwqqExtension{
+	void (*init)(LwqqClient* lc, struct LwqqExtension* pl);
+	void (*remove)(LwqqClient* lc,struct LwqqExtension* pl);
+}LwqqExtension;
+
+//basic and simply free extension, when no specialized version provided
+void lwqq_free_extension(LwqqClient* lc,LwqqExtension* ext);
 
 
 //=========================LOW LEVEL EVENT LOOP API====================//
@@ -218,3 +223,5 @@ void lwqq_async_timer_repeat(LwqqAsyncTimerHandle timer);
 //=========================LWQQ ASYNC LOW LEVEL EVENT LOOP API====================//
 
 #endif
+
+// vim: ts=3 sw=3 sts=3 noet

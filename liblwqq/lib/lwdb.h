@@ -13,6 +13,7 @@
 #define LWDB_H
 
 #include "type.h"
+#include "async.h"
 #include "swsqlite.h"
 
 /** return default database store dir */
@@ -21,13 +22,13 @@ const char* lwdb_get_config_dir();
 //========================= USER DB API =======================================/
 #define LWDB_CACHE_LEN 15
 typedef struct LwdbUserDB {
-    SwsDB *db;
-    struct{
-        SwsStmt* stmt;
-        char* sql;
-    }cache[LWDB_CACHE_LEN];
-    LwqqBuddy * (*query_buddy_info)(struct LwdbUserDB *db, const char *qqnumber);
-    LwqqErrorCode (*update_buddy_info)(struct LwdbUserDB *db, LwqqBuddy *buddy);
+	SwsDB *db;
+	struct{
+		SwsStmt* stmt;
+		char* sql;
+	}cache[LWDB_CACHE_LEN];
+	LwqqBuddy * (*query_buddy_info)(struct LwdbUserDB *db, const char *qqnumber);
+	//LwqqErrorCode (*update_buddy_info)(struct LwdbUserDB *db, LwqqBuddy *buddy);
 } LwdbUserDB;
 
 /** 
@@ -55,26 +56,29 @@ void lwdb_userdb_free(LwdbUserDB *db);
 /** 
  * insert a buddy info to database
  * if there is no database entry, create one and update it
+ * @param p_buddy <- a pointer to LwqqBuddy* . compable with LwqqEvents
  */
-LwqqErrorCode lwdb_userdb_insert_buddy_info(LwdbUserDB* db,LwqqBuddy* buddy);
+LwqqErrorCode lwdb_userdb_insert_buddy_info(LwdbUserDB* db,LwqqBuddy** p_buddy);
 /** 
  * insert a group info to database
  * if there is no database entry, create one and update it
+ * @param p_group <- a pointer to LwqqGroup* . compable with LwqqEvents
  */
-LwqqErrorCode lwdb_userdb_insert_group_info(LwdbUserDB* db,LwqqGroup* group);
+LwqqErrorCode lwdb_userdb_insert_group_info(LwdbUserDB* db,LwqqGroup** p_group);
 #define lwdb_userdb_insert_discu_info(db,discu) lwdb_userdb_insert_group_info(db,discu)
 
-//LwqqErrorCode lwdb_userdb_migrate_discu_info(LwdbUserDB* db,LwqqGroup* discu,int old_account);
 /** 
  * update a buddy info to database
  * if there is no database entry, error occurs
+ * @param p_buddy <- a pointer to LwqqBuddy* . compable with LwqqEvents
  */
-LwqqErrorCode lwdb_userdb_update_buddy_info(LwdbUserDB* db,LwqqBuddy* buddy);
+LwqqErrorCode lwdb_userdb_update_buddy_info(LwdbUserDB* db,LwqqBuddy** p_buddy);
 /** 
  * update a group info to database
  * if there is no database entry, error occurs
+ * @param p_group <- a pointer to LwqqGroup* . compable with LwqqEvents
  */
-LwqqErrorCode lwdb_userdb_update_group_info(LwdbUserDB* db,LwqqGroup* group);
+LwqqErrorCode lwdb_userdb_update_group_info(LwdbUserDB* db,LwqqGroup** p_group);
 #define lwdb_userdb_update_discu_info(db,discu) lwdb_userdb_update_group_info(db,discu)
 
 /** erase infomation older than @day and at most @last entries , 
@@ -108,6 +112,7 @@ const char* lwdb_userdb_read(LwdbUserDB* db,const char* key);
 int lwdb_userdb_write(LwdbUserDB* db,const char* key,const char* value);
 /* LwdbUserDB API end */
 
+LwqqExtension* lwdb_make_extension(LwdbUserDB* db);
 
 /************************************************************************/
 /* Initialization and final API */
@@ -128,22 +133,22 @@ void lwdb_finalize();
 /************************************************************************/
 /* LwdbGlobalDB API */
 typedef struct LwdbGlobalUserEntry {
-    char *qqnumber;
-    char *db_name;
-    char *password;
-    char *status;
-    char *rempwd;
-    LIST_ENTRY(LwdbGlobalUserEntry) entries;
+	char *qqnumber;
+	char *db_name;
+	char *password;
+	char *status;
+	char *rempwd;
+	LIST_ENTRY(LwdbGlobalUserEntry) entries;
 } LwdbGlobalUserEntry;
 
 typedef struct LwdbGlobalDB {
-    SwsDB *db;                  /**< Pointer sqlite3 db */
-    LwqqErrorCode (*add_new_user)(struct LwdbGlobalDB *db, const char *qqnumber);
-    LwdbGlobalUserEntry * (*query_user_info)(struct LwdbGlobalDB *db,
-                                             const char *qqnumber);
-    LIST_HEAD(, LwdbGlobalUserEntry) head; /**< QQ friends */
-    LwqqErrorCode (*update_user_info)(struct LwdbGlobalDB *db, const char *qqnumber,
-                                      const char *key, const char *value);
+	SwsDB *db;                  /**< Pointer sqlite3 db */
+	LwqqErrorCode (*add_new_user)(struct LwdbGlobalDB *db, const char *qqnumber);
+	LwdbGlobalUserEntry * (*query_user_info)(struct LwdbGlobalDB *db,
+			const char *qqnumber);
+	LIST_HEAD(, LwdbGlobalUserEntry) head; /**< QQ friends */
+	LwqqErrorCode (*update_user_info)(struct LwdbGlobalDB *db, const char *qqnumber,
+			const char *key, const char *value);
 } LwdbGlobalDB;
 
 /** 
@@ -182,3 +187,5 @@ void lwdb_userdb_read_from_client(LwqqClient* from,LwdbUserDB* to);
 #endif
 
 #endif
+
+// vim: ts=3 sw=3 sts=3 noet

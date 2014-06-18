@@ -572,7 +572,7 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
 
         mmsg->super.to = s_strdup(sb->uin);
         mmsg->sess.group_sig = s_strdup(sb->group_sig);
-        mmsg->sess.service_type = (LwqqServiceType)group->type;
+        mmsg->sess.service_type = (LwqqGroupType)group->type;
     }else
     {
         msg = lwqq_msg_new(LWQQ_MS_BUDDY_MSG);

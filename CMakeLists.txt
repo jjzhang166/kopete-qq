@@ -1,5 +1,7 @@
 project(kopete-lwqq)
 
+add_definitions( -DKDE_DEFAULT_DEBUG_AREA=14210 )
+
 set(CMAKE_MODULE_PATH 
     ${CMAKE_SOURCE_DIR}/cmake/modules
     ${CMAKE_SOURCE_DIR}/liblwqq/cmake
@@ -7,6 +9,10 @@ set(CMAKE_MODULE_PATH
 )
 
 add_subdirectory( liblwqq )
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS "-fpermissive")
+endif(CMAKE_COMPILER_IS_GNUCXX) 
 
 find_package(KDE4 REQUIRED)
 

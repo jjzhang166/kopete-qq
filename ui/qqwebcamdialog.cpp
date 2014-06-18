@@ -1,5 +1,5 @@
 /*
-    Kopete Webqq Protocol
+    Kopete QQ Protocol
 
     Copyright (c) 2006 by Cláudio da Silveira Pinheiro   <taupter@gmail.com>
     Kopete    (c) 2002-2006 by the Kopete developers  <kopete-devel@kde.org>
@@ -14,7 +14,7 @@
     *************************************************************************
 */
 #if 0
-#include "webqqwebcamdialog.h"
+#include "qqwebcamdialog.h"
 #include <webcamwidget.h>
 #ifndef VIDEOSUPPORT_DISABLED
 #include "avdevice/videodevicepool.h"
@@ -28,7 +28,7 @@
 #include <kdebug.h>
 #include <klocale.h>
 
-WebqqWebcamDialog::WebqqWebcamDialog( const QString &contactId, QWidget * parent )
+QQWebcamDialog::QQWebcamDialog( const QString &contactId, QWidget * parent )
 : KDialog( parent )
 {
 	setCaption( i18n( "Webcam for %1", contactId ) );
@@ -73,7 +73,7 @@ WebqqWebcamDialog::WebqqWebcamDialog( const QString &contactId, QWidget * parent
 #endif
 }
 
-WebqqWebcamDialog::~WebqqWebcamDialog( )
+QQWebcamDialog::~QQWebcamDialog( )
 {
 #ifndef VIDEOSUPPORT_DISABLED
 	mVideoDevicePool->stopCapturing();
@@ -81,7 +81,7 @@ WebqqWebcamDialog::~WebqqWebcamDialog( )
 #endif
 }
 
-void WebqqWebcamDialog::slotUpdateImage()
+void QQWebcamDialog::slotUpdateImage()
 {
 #ifndef VIDEOSUPPORT_DISABLED
 	kDebug() << "Getting image";
@@ -94,4 +94,4 @@ void WebqqWebcamDialog::slotUpdateImage()
 }
 
 #endif 
-#include "webqqwebcamdialog.moc"
+#include "qqwebcamdialog.moc"

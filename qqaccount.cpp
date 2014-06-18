@@ -574,7 +574,7 @@ void QQAccount::ac_display_user_info(qq_account *ac, LwqqBuddy *b, char *who)
         id = QString(uin);
     }else{
         id = QString(who);
-        lwdb_userdb_update_buddy_info(ac->db, b);
+        lwdb_userdb_update_buddy_info(ac->db, &b);
     }
     QQUserInfoForm *info = new QQUserInfoForm(contact(id));
     info->setInfo(b);
@@ -600,7 +600,7 @@ void QQAccount::receivedGroupMessage(LwqqGroup *group, LwqqMsgMessage *msg)
     message->send_id = s_strdup(msg->group.send);
     message->when = msg->time;
     message->what = s_strdup(buf);
-    QString id = QString(group->type == LwqqGroup::LWQQ_GROUP_QUN?group->gid:group->did);
+    QString id = QString(group->type == LWQQ_GROUP_QUN?group->gid:group->did);
     MsgDataList msgList = m_msgMap[id];
     msgList.append(*message);
     m_msgMap.insert(id, msgList);
@@ -661,7 +661,7 @@ void QQAccount::ac_rewrite_whole_message_list(LwqqAsyncEvent *ev, qq_account *ac
         group_msg *message;
         LwqqBuddy* buddy;
         QString sendId;
-        QString id = QString(group->type == LwqqGroup::LWQQ_GROUP_QUN?group->gid:group->did);
+        QString id = QString(group->type == LWQQ_GROUP_QUN?group->gid:group->did);
         MsgDataList msgList = m_msgMap[id];
         /*find the contact*/
         QQContact * chatContact = dynamic_cast<QQContact *>(contacts().value( id ));
@@ -720,7 +720,7 @@ void QQAccount::ac_qq_set_group_name(LwqqGroup *group)
 
 bool QQAccount::group_is_qun(LwqqGroup *group)
 {
-    return (group->type==LwqqGroup::LWQQ_GROUP_QUN);
+    return (group->type==LWQQ_GROUP_QUN);
 }
 
 void QQAccount::whisper_message(LwqqClient *lc, LwqqMsgMessage *mmsg)
@@ -969,12 +969,12 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
 {
     LwqqSimpleBuddy* member;
     LwqqBuddy* buddy;
-    QString g_id = QString((group->type == LwqqGroup::LWQQ_GROUP_QUN? group->gid:group->did));
+    QString g_id = QString((group->type == LWQQ_GROUP_QUN? group->gid:group->did));
     if(!contact(g_id))
         return;
     contact(g_id)->set_group_status(true);
     contact(g_id)->setContactType(Contact_Group);
-    if(group->type == LwqqGroup::LWQQ_GROUP_DISCU || group->type == LwqqGroup::LWQQ_GROUP_QUN)
+    if(group->type == LWQQ_GROUP_DISCU || group->type == LWQQ_GROUP_QUN)
     {
         LIST_FOREACH(member,&group->members,entries)
         {
@@ -1003,7 +1003,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                                 if(!contact(QString(buddy->qqnumber)))
                                     return;
                                 contact(QString(buddy->qqnumber))->setContactType(Contact_Session);
-                                contact(QString(buddy->qqnumber))->set_session_info(QString((group->type == LwqqGroup::LWQQ_GROUP_QUN? group->gid:group->did)), \
+                                contact(QString(buddy->qqnumber))->set_session_info(QString((group->type == LWQQ_GROUP_QUN? group->gid:group->did)), \
                                                                                     QString::fromUtf8(group->name));
                                 contact(QString(buddy->qqnumber))->setProperty(Kopete::Global::Properties::self ()->nickName (), contactName);
                                 //contact(QString(buddy->qqnumber))->setOnlineStatus(statusFromLwqqStatus(buddy->stat));
@@ -1063,7 +1063,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                         }
                     }
                     LIST_INSERT_HEAD(&lc->friends,buddy,entries);
-                    lwdb_userdb_insert_buddy_info(((qq_account*)(lc->data))->db, buddy);
+                    lwdb_userdb_insert_buddy_info(((qq_account*)(lc->data))->db, &buddy);
                 }
             }
         }
@@ -1105,7 +1105,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                     lwdb_userdb_insert_buddy_info(((qq_account*)(m_lc->data))->db, buddy);
 
                 }
-                contact(QString((group->type == LwqqGroup::LWQQ_GROUP_QUN? group->gid:group->did)))->qq_addcontacts(contact(QString(buddy->qqnumber)));
+                contact(QString((group->type == LWQQ_GROUP_QUN? group->gid:group->did)))->qq_addcontacts(contact(QString(buddy->qqnumber)));
             }else{
 
                 if( !contact(QString(member->uin)))
@@ -1178,7 +1178,7 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
         //myself()->setOnlineStatus( m_targetStatus );
         password().setWrong(false);
 
-        afterLogin(lc);
+        //afterLogin(lc);
         break;
     case LWQQ_EC_ERROR: /*error verify code or error password or error username*/
         //printf("err msg: %s\n",lc->last_err);
@@ -1222,7 +1222,10 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
         return;
     }
 
-
+//    ac->state = CONNECTED;
+    LwqqAsyncEvent* ev = lwqq_info_get_friends_info(lc, NULL, NULL);
+    lwqq_async_add_event_listener(ev, _C_(p,friends_valid_hash,ev));
+    return ;
 }
 
 void QQAccount::pollMessage()
@@ -1251,7 +1254,7 @@ void QQAccount::ac_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
 {
     if(event->result != LWQQ_EC_OK){
       printf("Get group list failed, error code is %d\n", event->result);
-
+        return;
     }
     LwqqAsyncEvset* set = lwqq_async_evset_new();
     LwqqAsyncEvent* ev;
@@ -1382,7 +1385,7 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
     QString categoryName;
     MsgDataList msgList;
     msgList.clear();
-    if(group->type == LwqqGroup::LWQQ_GROUP_QUN)
+    if(group->type == LWQQ_GROUP_QUN)
     {
         categoryName = QString("Group");
         m_msgMap.insert(QString(group->gid), msgList);
@@ -1441,7 +1444,7 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
         lwqq_async_add_evset_listener(set,_C_(2p,cb_group_avatar, lc, group));
 
     }
-    if(group->type == LwqqGroup::LWQQ_GROUP_QUN)
+    if(group->type == LWQQ_GROUP_QUN)
     {
         addContact( QString(group->gid), displayName,  targetGroup, Kopete::Account::ChangeKABC );
         if(!contact(QString(group->gid)))
@@ -1451,7 +1454,7 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
         QObject::connect(contact(QString(group->gid)) , SIGNAL(blockSignal(QString)), this, SLOT(slotBlock(QString)));
         QObject::connect(contact(QString(group->gid)), SIGNAL(getUserInfoSignal(QString,ConType)),\
                          this, SLOT(slotGetUserInfo(QString,ConType)));
-    }else if(group->type == LwqqGroup::LWQQ_GROUP_DISCU)
+    }else if(group->type == LWQQ_GROUP_DISCU)
     {
         addContact( QString(group->did), displayName,  targetGroup, Kopete::Account::ChangeKABC );
         if(!contact(QString(group->did)))
@@ -1578,13 +1581,7 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
 
 
     ac->state = LOAD_COMPLETED;
-    LwqqPollOption flags = POLL_AUTO_DOWN_DISCU_PIC|POLL_AUTO_DOWN_GROUP_PIC|POLL_AUTO_DOWN_BUDDY_PIC;
-    if(ac->flag& REMOVE_DUPLICATED_MSG)
-        flags |= POLL_REMOVE_DUPLICATED_MSG;
-    if(ac->flag& NOT_DOWNLOAD_GROUP_PIC)
-        flags &= ~POLL_AUTO_DOWN_GROUP_PIC;
-    
-    lwqq_msglist_poll(lc->msg_list, flags);
+
 }
 
 
@@ -1596,27 +1593,35 @@ void QQAccount::ac_login_stage_f(LwqqClient* lc)
     lwdb_userdb_begin(ac->db);
     LIST_FOREACH(buddy,&lc->friends,entries) {
         if(buddy->last_modify == -1 || buddy->last_modify == 0){
-            lwdb_userdb_insert_buddy_info(ac->db, buddy);
+            lwdb_userdb_insert_buddy_info(ac->db, &buddy);
             friend_come(lc, buddy);
         }
     }
     LIST_FOREACH(group,&lc->groups,entries){
         if(group->last_modify == -1 || group->last_modify == 0){
-            lwdb_userdb_insert_group_info(ac->db, group);
+            lwdb_userdb_insert_group_info(ac->db, &group);
             group_come(lc,group);
         }
     }
-    if(ac->flag & CACHE_TALKGROUP){
-        LIST_FOREACH(discu,&lc->discus,entries){
-            if(discu->last_modify==-1){
-                lwqq_override(discu->account, s_strdup(discu->info_seq));
-                lwdb_userdb_insert_discu_info(ac->db, discu);
-                discu_come(lc,discu);
-            }
-        }
-    }
+//    if(ac->flag & CACHE_TALKGROUP){
+//        LIST_FOREACH(discu,&lc->discus,entries){
+//            if(discu->last_modify==-1){
+//                lwqq_override(discu->account, s_strdup(discu->info_seq));
+//                lwdb_userdb_insert_discu_info(ac->db, discu);
+//                discu_come(lc,discu);
+//            }
+//        }
+//    }
     lwdb_userdb_commit(ac->db);
     myself()->setOnlineStatus( m_targetStatus );
+
+    LwqqPollOption flags = POLL_AUTO_DOWN_DISCU_PIC|POLL_AUTO_DOWN_GROUP_PIC|POLL_AUTO_DOWN_BUDDY_PIC;
+    if(ac->flag& REMOVE_DUPLICATED_MSG)
+        flags |= POLL_REMOVE_DUPLICATED_MSG;
+    if(ac->flag& NOT_DOWNLOAD_GROUP_PIC)
+        flags &= ~POLL_AUTO_DOWN_GROUP_PIC;
+
+    lwqq_msglist_poll(lc->msg_list, flags);
 }
 
 
@@ -1970,7 +1975,7 @@ void QQAccount::ac_show_messageBox(msg_type type, const char *title, const char 
             return;
         addedContact->setContactType(Contact_Chat);
         LIST_INSERT_HEAD(&m_lc->friends,buddy,entries);
-        lwdb_userdb_insert_buddy_info(((qq_account*)(m_lc->data))->db, buddy);
+        lwdb_userdb_insert_buddy_info(((qq_account*)(m_lc->data))->db, &buddy);
         kDebug(WEBQQ_GEN_DEBUG)<<"edn";
     }
 }
@@ -2161,21 +2166,27 @@ static char* hash_with_remote_file(const char* uin,const char* ptqq,void* js)
     return hash_with_local_file(uin, ptqq, js);
 }
 
-static void friends_valid_hash(LwqqAsyncEvent* ev,LwqqHashFunc last_hash)
+static void friends_valid_hash(LwqqAsyncEvent* ev)
 {
     LwqqClient* lc = ev->lc;
     qq_account* ac = (qq_account*)lc->data;
     if(ev->result == LWQQ_EC_HASH_WRONG){
-        if(last_hash == hash_with_local_file){
-            get_friends_info_retry(lc, hash_with_remote_file);
-        }
+//        if(last_hash == hash_with_local_file){
+//            get_friends_info_retry(lc, hash_with_remote_file);
+//        }
         return;
     }
     if(ev->result != LWQQ_EC_OK){
         return;
     }
+//    LwqqAsyncEvent* event;
+//    event = lwqq_info_get_group_name_list(lc,NULL);
+//    lwqq_async_add_event_listener(event,_C_(2p,cb_login_stage_2,event,lc));
+
+    const LwqqHashEntry* succ_hash = lwqq_hash_get_last(lc);
+    lwdb_userdb_write(ac->db, "last_hash", succ_hash->name);
     LwqqAsyncEvent* event;
-    event = lwqq_info_get_group_name_list(lc,NULL);
+    event = lwqq_info_get_group_name_list(lc, succ_hash->func, succ_hash->data);
     lwqq_async_add_event_listener(event,_C_(2p,cb_login_stage_2,event,lc));
 }
 
@@ -2421,7 +2432,7 @@ static void search_group_receipt(LwqqAsyncEvent* ev,LwqqGroup* g)
 
 static void search_group(LwqqClient* lc,const char* text)
 {
-    LwqqGroup* g = lwqq_group_new(LwqqGroup::LWQQ_GROUP_QUN);
+    LwqqGroup* g = lwqq_group_new(LWQQ_GROUP_QUN);
     LwqqAsyncEvent* ev;
     ev = lwqq_info_search_group_by_qq(lc, text, g);
     lwqq_async_add_event_listener(ev, _C_(2p,search_group_receipt,ev,g));
@@ -2438,7 +2449,7 @@ static void write_buddy_to_db(LwqqClient* lc,LwqqBuddy* b)
 {
     qq_account* ac = (qq_account*)lwqq_client_userdata(lc);
 
-    lwdb_userdb_insert_buddy_info(ac->db, b);
+    lwdb_userdb_insert_buddy_info(ac->db, &b);
     cb_return_friend_come(lc, b);
 }
 

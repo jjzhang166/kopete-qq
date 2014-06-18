@@ -1,5 +1,5 @@
 /*
-    Kopete Webqq Protocol
+    Kopete QQ Protocol
 
     Copyright (c) 2006 by Cláudio da Silveira Pinheiro   <taupter@gmail.com>
     Kopete    (c) 2002-2006 by the Kopete developers  <kopete-devel@kde.org>
@@ -36,12 +36,12 @@ namespace Kopete {
 	class WebcamWidget;
 }
 
-class WebqqWebcamDialog : public KDialog
+class QQWebcamDialog : public KDialog
 {
 Q_OBJECT
 public:
-	explicit WebqqWebcamDialog( const QString &, QWidget* parent = 0 );
-	~WebqqWebcamDialog();
+	explicit QQWebcamDialog( const QString &, QWidget* parent = 0 );
+	~QQWebcamDialog();
 	
 public slots:
 	void slotUpdateImage();

@@ -254,7 +254,7 @@ static void confirm_table_no(LwqqConfirmTable* table,const char *input);
 static void system_message(LwqqClient* lc,LwqqMsgSystem* system,LwqqBuddy* buddy);
 static char* hash_with_local_file(const char* uin,const char* ptqq,void* js);
 static char* hash_with_remote_file(const char* uin,const char* ptqq,void* js);
-static void friends_valid_hash(LwqqAsyncEvent* ev,LwqqHashFunc last_hash);
+static void friends_valid_hash(LwqqAsyncEvent* ev);
 void qq_add_buddy( LwqqClient* lc, const char *username, const char *message);
 static void add_friend(LwqqClient* lc,LwqqConfirmTable* c,LwqqBuddy* b,char* message);
 static void get_friends_info_retry(LwqqClient* lc,LwqqHashFunc hashtry);

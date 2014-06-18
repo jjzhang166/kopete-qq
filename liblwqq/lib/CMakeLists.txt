@@ -48,7 +48,7 @@ include_directories(
 if(UNIX)
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-strict-aliasing")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ")
-  add_definitions(-fPIC)
+  #  add_definitions(-fPIC)
 endif(UNIX)
 
 if(WIN32)
@@ -79,7 +79,7 @@ target_link_libraries(lwqq
     ${ZLIB_LIBRARIES}
     ${MOZJS_LIBRARIES}
     ${LWQQ_OTHER_LIBS}
-	-Wl,-Bdynamic pthread
+	#	-Wl,-Bdynamic pthread
     )
 
 #target_link_libraries(lwqq-static

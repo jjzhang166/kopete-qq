@@ -14,25 +14,24 @@
 #include "type.h"
 #include "msg.h"
 
-typedef char* (*LwqqHashFunc)(const char* uin,const char* ptqq,void* userdata);
 /** change discu member operation structure */
 typedef struct LwqqDiscuMemChange LwqqDiscuMemChange;
 /**群名片*/
 typedef struct LwqqBusinessCard {
-    char* phone;
-    char* uin;
-    char* email;
-    char* remark;
-    char* gcode;
-    char* name;
-    LwqqGender gender;
+	char* phone;
+	char* uin;
+	char* email;
+	char* remark;
+	char* gcode;
+	char* name;
+	LwqqGender gender;
 } LwqqBusinessCard;
 
 /**最近联系人*/
 typedef struct LwqqRecentItem {
-    LwqqMessageType type;
-    char* uin;
-    LIST_ENTRY(LwqqRecentItem) entries;
+	LwqqMessageType type;
+	char* uin;
+	LIST_ENTRY(LwqqRecentItem) entries;
 } LwqqRecentItem;
 
 /**最近联系人列表*/
@@ -43,8 +42,8 @@ typedef LIST_HEAD(,LwqqRecentItem) LwqqRecentList;
  * information, friends group information, and so on
  * 
  * @param lc 
- * @param hash NULL to use internal hash function
- * @param err 
+ * @param hash: NULL to use lwqq_hash_auto function, auto select existing hash
+ * @param userdata: the extra data push to hash function, most of time is NULL
  */
 LwqqAsyncEvent* lwqq_info_get_friends_info(LwqqClient *lc,LwqqHashFunc hash, void* userdata);
 
@@ -54,7 +53,7 @@ LwqqAsyncEvent* lwqq_info_get_friends_info(LwqqClient *lc,LwqqHashFunc hash, voi
  * @param lc 
  * @param err 
  */
-LwqqAsyncEvent* lwqq_info_get_group_name_list(LwqqClient *lc, LwqqErrorCode *err);
+LwqqAsyncEvent* lwqq_info_get_group_name_list(LwqqClient *lc, LwqqHashFunc hash, void* data);
 
 LwqqAsyncEvent* lwqq_info_get_discu_name_list(LwqqClient* lc);
 
@@ -62,7 +61,7 @@ LwqqAsyncEvent* lwqq_info_get_discu_name_list(LwqqClient* lc);
 /** 
  * Get detail information of QQ friend(NB: include myself)
  * QQ server need us to pass param like:
- * tuin=244569070&verifysession=&code=&vfqq=e64da25c140c66
+ * tuin=244569070&verifysession=&code=&vfwebqq=e64da25c140c66
  * 
  * @param lc 
  * @param buddy 
@@ -76,22 +75,15 @@ LwqqAsyncEvent* lwqq_info_get_friend_detail_info(LwqqClient *lc, LwqqBuddy *budd
  * @param err the pointer of LwqqErrorCode
  */
 #define lwqq_info_get_friend_avatar(lc,buddy) \
-((buddy!=NULL) ? lwqq_info_get_avatar(lc,buddy,NULL):NULL) 
+	((buddy!=NULL) ? lwqq_info_get_avatar(lc,buddy,NULL):NULL) 
 
 #define lwqq_info_get_group_avatar(lc,group) \
-((group!=NULL) ? lwqq_info_get_avatar(lc,NULL,group):NULL) 
+	((group!=NULL) ? lwqq_info_get_avatar(lc,NULL,group):NULL) 
 
 
 LwqqAsyncEvent* lwqq_info_get_avatar(LwqqClient* lc,LwqqBuddy* buddy,LwqqGroup* group);
 
 LwqqErrorCode lwqq_info_save_avatar(LwqqBuddy* b,LwqqGroup* g,const char* path);
-/** 
- * Get all friends qqnumbers
- * 
- * @param lc 
- * @param err 
- */
-void lwqq_info_get_all_friend_qqnumbers(LwqqClient *lc, LwqqErrorCode *err);
 
 /** 
  * Get friend qqnumber
@@ -110,13 +102,11 @@ LwqqAsyncEvent* lwqq_info_get_qqnumber(LwqqClient* lc,const char* uin_gcode,char
 
 /**
  * Get QQ groups detail information. 
- * 
- * @param lc 
- * @param group
- * @param err 
+ * Inside use LwqqAsyncQueue means you can call this function many times before
+ * didn't load list complete and only occur one real network request
  */
 LwqqAsyncEvent* lwqq_info_get_group_detail_info(LwqqClient *lc, LwqqGroup *group,
-                                     LwqqErrorCode *err);
+		LwqqErrorCode *err);
 #define lwqq_info_get_discu_detail_info(lc,group) (lwqq_info_get_group_detail_info(lc,group,NULL));
 
 /** 
@@ -149,6 +139,9 @@ LwqqAsyncEvent* lwqq_info_delete_friend(LwqqClient* lc,LwqqBuddy* buddy,LwqqDelF
 /** 
  * after call this. before real delete. lwqq would call async_opt->delete_group.
  * in this ui should delete linked group info
+ *
+ * because if you directly use async event api, lwqq would remove LwqqGroup
+ * first, then do callback, which makes data crashs. so we need use events api
  */
 LwqqAsyncEvent* lwqq_info_delete_group(LwqqClient* lc,LwqqGroup* group);
 //no necessary to call
@@ -243,9 +236,17 @@ void lwqq_discu_mem_change_free(LwqqDiscuMemChange* chg);
 LwqqErrorCode lwqq_discu_add_buddy(LwqqDiscuMemChange* mem,LwqqBuddy* b);
 /** add a group member to change operate */
 LwqqErrorCode lwqq_discu_add_group_member(LwqqDiscuMemChange* mem,LwqqSimpleBuddy* sb,LwqqGroup* g);
-/** do real change member work . chg would be freed automaticly */
+/** 
+ * do real change member work . chg would be freed automaticly 
+ * trigger group_member_chg event
+ */
 LwqqAsyncEvent* lwqq_info_change_discu_mem(LwqqClient* lc,LwqqGroup* discu,LwqqDiscuMemChange* chg);
-/** create a new discu with members in chg */
+/** 
+ * create a new discu with members in chg 
+ * trigger new_group events
+ */
 LwqqAsyncEvent* lwqq_info_create_discu(LwqqClient* lc,LwqqDiscuMemChange* chg,const char* dname);
 
 #endif  /* LWQQ_INFO_H */
+
+// vim: ts=3 sw=3 sts=3 noet
