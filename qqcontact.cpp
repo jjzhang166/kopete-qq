@@ -436,7 +436,7 @@ void QQContact::set_group_name(const QString &name)
         m_groupManager->setTopic(name);
 }
 
-static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* what)
+static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* what,long retry)
 {
     printf("[%s] \n", __FUNCTION__);
     qq_account* ac = lwqq_async_event_get_owner(ev)->data; 
@@ -461,6 +461,10 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
         }
         if(err == LWQQ_EC_LOST_CONN){
             vp_do_repeat(ac->qq->events->poll_lost, NULL);
+        }else if(err == 108 && retry>0) {
+            LwqqAsyncEvent* event = lwqq_msg_send(ac->qq, mmsg);
+            lwqq_async_add_event_listener(event, _C_(4pl,cb_send_receipt,event, msg, serv_id, what,retry-1));
+            return;
         }
     }
     if(mmsg->upload_retry <0)
@@ -592,7 +596,7 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
     translate_message_to_struct(NULL, NULL, what, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(lc,mmsg);
-    lwqq_async_add_event_listener(ev,_C_(4p, cb_send_receipt,ev,msg,strdup(who),strdup(what)));
+    lwqq_async_add_event_listener(ev,_C_(4pl, cb_send_receipt,ev,msg,strdup(who),strdup(what), 2L));
     fprintf(stderr, "qq send im\n");
     return 1;
 }
@@ -622,7 +626,7 @@ int QQContact::qq_send_chat(const char *gid, const char *message)
     translate_message_to_struct(ac->qq, group->gid, message, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(ac->qq,mmsg);
-    lwqq_async_add_event_listener(ev, _C_(4p,cb_send_receipt,ev,msg,s_strdup(group->gid),s_strdup(message)));
+    lwqq_async_add_event_listener(ev, _C_(4pl,cb_send_receipt,ev,msg,s_strdup(group->gid),s_strdup(message), 2L));
 
 
     return 1;

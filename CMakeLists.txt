@@ -1,6 +1,5 @@
 project(kopete-lwqq)
 
-add_definitions( -DKDE_DEFAULT_DEBUG_AREA=14210 )
 
 set(CMAKE_MODULE_PATH 
     ${CMAKE_SOURCE_DIR}/cmake/modules

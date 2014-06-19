@@ -209,7 +209,7 @@ private:
 
     void whisper_message(LwqqClient* lc,LwqqMsgMessage* mmsg);
 
-    void receivedGroupMessage(LwqqGroup* group, LwqqMsgMessage *msg);
+    void receivedGroupMessage(LwqqClient *lc, LwqqGroup* group, LwqqMsgMessage *msg);
 
     bool group_is_qun(LwqqGroup *group);
     void rewrite_group_msg(const QString &id);
