@@ -1,4 +1,7 @@
 project(kopete-qq)
+set(LWQQ_VERSION_MAJOR "0")
+set(LWQQ_VERSION_MINOR "3")
+set(LWQQ_VERSION_PATCH "1")
 
 
 set(CMAKE_MODULE_PATH 
@@ -7,7 +10,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
 )
 
-add_subdirectory( liblwqq )
+#add_subdirectory( liblwqq )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "-fpermissive")
@@ -29,6 +32,7 @@ add_definitions( -DKDE_DEFAULT_DEBUG_AREA=14210 )
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBJS REQUIRED mozjs185)
+pkg_check_modules(LWQQ REQUIRED lwqq>=${LWQQ_VERSION_MAJOR}.${LWQQ_VERSION_MINOR}.${LWQQ_VERSION_PATCH})
 
 
 set(CMAKE_REQUIRED_DEFINITIONS ${_KDE4_PLATFORM_DEFINITIONS})
@@ -127,7 +131,7 @@ kde4_add_plugin(kopete_qq ${kopete_qq_PART_SRCS})
 
 
 #target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
-target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  webqq ${LIBJS_LIBRARIES})
+target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
 if(NOT DISABLE_VIDEOSUPPORT)
   target_link_libraries(kopete_qq kopete_videodevice)
 endif(NOT DISABLE_VIDEOSUPPORT)
