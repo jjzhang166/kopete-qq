@@ -1,4 +1,4 @@
-project(kopete-lwqq)
+project(kopete-qq)
 
 
 set(CMAKE_MODULE_PATH 
@@ -127,7 +127,7 @@ kde4_add_plugin(kopete_qq ${kopete_qq_PART_SRCS})
 
 
 #target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
-target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
+target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  webqq ${LIBJS_LIBRARIES})
 if(NOT DISABLE_VIDEOSUPPORT)
   target_link_libraries(kopete_qq kopete_videodevice)
 endif(NOT DISABLE_VIDEOSUPPORT)

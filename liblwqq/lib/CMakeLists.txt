@@ -72,8 +72,8 @@ endif()
 
 #add_library(lwqq-static STATIC ${LWQQ_LIST} )
 #set_target_properties(lwqq-static PROPERTIES OUTPUT_NAME lwqq)
-add_library(lwqq SHARED ${LWQQ_LIST} )
-target_link_libraries(lwqq
+add_library(webqq SHARED ${LWQQ_LIST} )
+target_link_libraries(webqq
     ${SQLITE_LIBRARIES}
     ${CURL_LIBRARIES}
     ${ZLIB_LIBRARIES}
@@ -92,7 +92,7 @@ target_link_libraries(lwqq
 #    )
 
 if(LWQQ_INSTALL)
-install(TARGETS lwqq DESTINATION lib)
+install(TARGETS webqq DESTINATION lib)
 #install(TARGETS lwqq-static DESTINATION lib)
 #install(FILES ${LWQQ_HEADER} DESTINATION include/lwqq)
 endif()

@@ -86,57 +86,57 @@
 #define OPEN_URL(var,url) snprintf(var,sizeof(var),"xdg-open '%s'",url);
 #define GLOBAL_HASH_JS() SHARE_DATA_DIR"/hash.js"
 #define LOCAL_HASH_JS(buf)  (snprintf(buf,sizeof(buf),"%s/hash.js",\
-            lwdb_get_config_dir()),buf)
-            
+    lwdb_get_config_dir()),buf)
+
 
 QQAccount::QQAccount( QQProtocol *parent, const QString& accountID )
-: Kopete::PasswordedAccount ( parent, accountID, false)
+    : Kopete::PasswordedAccount ( parent, accountID, false)
 {	
-	m_protocol = parent;
-	m_lc = NULL;
-	// Init the myself contact
+    m_protocol = parent;
+    m_lc = NULL;
+    // Init the myself contact
     setMyself( new QQContact( this, accountId(), accountId(), Kopete::ContactList::self()->myself() ) );
     myself()->setOnlineStatus( m_protocol->QQOffline );
 
-	/*init lwqq account*/
-	//initLwqqAccount();
+    /*init lwqq account*/
+    //initLwqqAccount();
     this->cleanAll_contacts();
-	m_targetStatus = Kopete::OnlineStatus::Offline;
-	
-//    QString filename = "/home/zj/497717277.png";
-//    QFile f(filename);
-//    avatarData.clear();
-//    if (f.exists() && f.size() > 0 && f.open(QIODevice::ReadOnly))
-//    {
-//        kDebug(WEBQQ_GEN_DEBUG)<<"read";
-//        avatarData = f.readAll();
-//        f.close();
-//    }
-	qRegisterMetaType<CallbackObject>("CallbackObject");
+    m_targetStatus = Kopete::OnlineStatus::Offline;
 
-	QObject::connect( ObjectInstance::instance(), SIGNAL(signal_from_instance(CallbackObject)),
-			  this,SLOT(slotReceivedInstanceSignal(CallbackObject)) ); 
-	
+    //    QString filename = "/home/zj/497717277.png";
+    //    QFile f(filename);
+    //    avatarData.clear();
+    //    if (f.exists() && f.size() > 0 && f.open(QIODevice::ReadOnly))
+    //    {
+    //        kDebug(WEBQQ_GEN_DEBUG)<<"read";
+    //        avatarData = f.readAll();
+    //        f.close();
+    //    }
+    qRegisterMetaType<CallbackObject>("CallbackObject");
+
+    QObject::connect( ObjectInstance::instance(), SIGNAL(signal_from_instance(CallbackObject)),
+                      this,SLOT(slotReceivedInstanceSignal(CallbackObject)) );
+
 }
 
 QQAccount::~QQAccount()
 {
-	//delete m_server;
+    //delete m_server;
 }
 
 void QQAccount::fillActionMenu( KActionMenu *actionMenu )
 {
-	Kopete::Account::fillActionMenu( actionMenu );
+    Kopete::Account::fillActionMenu( actionMenu );
 
-	actionMenu->addSeparator();
+    actionMenu->addSeparator();
 
-	KAction *action;
+    KAction *action;
 
     action = new KAction (KIcon("qq_showvideo"), i18n ("Show my own video..."), actionMenu );
-        //, "actionShowVideo");
-	QObject::connect( action, SIGNAL(triggered(bool)), this, SLOT(slotShowVideo()) );
-	actionMenu->addAction(action);
-	action->setEnabled( isConnected() );
+    //, "actionShowVideo");
+    QObject::connect( action, SIGNAL(triggered(bool)), this, SLOT(slotShowVideo()) );
+    actionMenu->addAction(action);
+    action->setEnabled( isConnected() );
 
     KAction *nickAction = new KAction (KIcon("qq_changeNick"), i18n ("change LongNick"), actionMenu );
     QObject::connect(nickAction, SIGNAL(triggered(bool)), this, SLOT(slotChangeNick()));
@@ -154,88 +154,88 @@ void QQAccount::slotChangeNick()
 
 void QQAccount::setAway( bool away, const QString & /* reason */ )
 {
-	if ( away )
-		slotGoAway();
-	else
-		slotGoOnline();
+    if ( away )
+        slotGoAway();
+    else
+        slotGoOnline();
 }
 
 void QQAccount::setOnlineStatus(const Kopete::OnlineStatus& status, const Kopete::StatusMessage &reason, const OnlineStatusOptions& /*options*/)
 {
-	if ( status.status() == Kopete::OnlineStatus::Online &&
-			myself()->onlineStatus().status() == Kopete::OnlineStatus::Offline )
-	{
-	    m_targetStatus = Kopete::OnlineStatus::Online;
-	    slotGoOnline();		
-	}
-	else if (status.status() == Kopete::OnlineStatus::Online &&
-			(myself()->onlineStatus().status() == Kopete::OnlineStatus::Away || 
-				myself()->onlineStatus().status() == Kopete::OnlineStatus::Busy||
-				myself()->onlineStatus().status() == Kopete::OnlineStatus::Invisible) )
-	{
-	    m_targetStatus = Kopete::OnlineStatus::Online; 
-	    setAway( false, reason.message() );		
-	}
-	else if ( status.status() == Kopete::OnlineStatus::Offline )
-		slotGoOffline();
-	else if ( status.status() == Kopete::OnlineStatus::Away )
-	{
-	      m_targetStatus = Kopete::OnlineStatus::Away;
-	      slotGoAway( /* reason */ );	
-	}
-	else if ( status.status() == Kopete::OnlineStatus::Busy )
-	{
-	    m_targetStatus = Kopete::OnlineStatus::Busy;
-	    slotGoBusy( /* reason */ );	
-	}
-	else if ( status.status() == Kopete::OnlineStatus::Invisible )
-	{
-	    m_targetStatus = Kopete::OnlineStatus::Invisible;
-	    slotGoHidden( );
-	}
+    if ( status.status() == Kopete::OnlineStatus::Online &&
+         myself()->onlineStatus().status() == Kopete::OnlineStatus::Offline )
+    {
+        m_targetStatus = Kopete::OnlineStatus::Online;
+        slotGoOnline();
+    }
+    else if (status.status() == Kopete::OnlineStatus::Online &&
+             (myself()->onlineStatus().status() == Kopete::OnlineStatus::Away ||
+              myself()->onlineStatus().status() == Kopete::OnlineStatus::Busy||
+              myself()->onlineStatus().status() == Kopete::OnlineStatus::Invisible) )
+    {
+        m_targetStatus = Kopete::OnlineStatus::Online;
+        setAway( false, reason.message() );
+    }
+    else if ( status.status() == Kopete::OnlineStatus::Offline )
+        slotGoOffline();
+    else if ( status.status() == Kopete::OnlineStatus::Away )
+    {
+        m_targetStatus = Kopete::OnlineStatus::Away;
+        slotGoAway( /* reason */ );
+    }
+    else if ( status.status() == Kopete::OnlineStatus::Busy )
+    {
+        m_targetStatus = Kopete::OnlineStatus::Busy;
+        slotGoBusy( /* reason */ );
+    }
+    else if ( status.status() == Kopete::OnlineStatus::Invisible )
+    {
+        m_targetStatus = Kopete::OnlineStatus::Invisible;
+        slotGoHidden( );
+    }
 }
 
 void QQAccount::init_client_events(LwqqClient *lc)
 {
     fprintf(stderr, "init_client_events:%p", lc);
     lwqq_add_event(lc->events->login_complete,
-            _C_(2p,cb_login_stage_1,lc, &lc->args->login_ec));
+                   _C_(2p,cb_login_stage_1,lc, &lc->args->login_ec));
     lwqq_add_event(lc->events->new_friend,
-            _C_(2p,cb_friend_come,lc, &lc->args->buddy));
+                   _C_(2p,cb_friend_come,lc, &lc->args->buddy));
     lwqq_add_event(lc->events->new_group,
-            _C_(2p,cb_group_come,lc, &lc->args->group));
+                   _C_(2p,cb_group_come,lc, &lc->args->group));
     lwqq_add_event(lc->events->poll_msg,
-            _C_(p,cb_qq_msg_check,lc));
+                   _C_(p,cb_qq_msg_check,lc));
     lwqq_add_event(lc->events->poll_lost,
-            _C_(p,cb_lost_connection,lc));
+                   _C_(p,cb_lost_connection,lc));
     lwqq_add_event(lc->events->need_verify,
-            _C_(2p,cb_need_verify2,lc, &lc->args->vf_image));
+                   _C_(2p,cb_need_verify2,lc, &lc->args->vf_image));
     lwqq_add_event(lc->events->delete_group,
-            _C_(2p,cb_delete_group_local,lc, &lc->args->deleted_group));
+                   _C_(2p,cb_delete_group_local,lc, &lc->args->deleted_group));
     lwqq_add_event(lc->events->group_member_chg,
-            _C_(2p,cb_flush_group_members,lc, &lc->args->group));
+                   _C_(2p,cb_flush_group_members,lc, &lc->args->group));
     lwqq_add_event(lc->events->upload_fail,
-            _C_(4p,cb_upload_content_fail,lc, &lc->args->serv_id, &lc->args->content, &lc->args->err));
+                   _C_(4p,cb_upload_content_fail,lc, &lc->args->serv_id, &lc->args->content, &lc->args->err));
 }
 
 void QQAccount::initLwqqAccount()
 {
-	if(m_lc)
-	  return;
-	
+    if(m_lc)
+        return;
+
     kDebug(WEBQQ_GEN_DEBUG)<<"init lwqq account\n";
 
-		
+
     char* username = s_strdup(accountId().toAscii().constData());
     char* password = "XXXX";
-	qq_account* ac = qq_account_new(username, password);
+    qq_account* ac = qq_account_new(username, password);
 
-	m_lc = ac->qq;
+    m_lc = ac->qq;
     init_client_events(ac->qq);
-	
-	ac->db = lwdb_userdb_new(username,NULL,0);
-	ac->qq->data = ac;
-	
+
+    ac->db = lwdb_userdb_new(username,NULL,0);
+    ac->qq->data = ac;
+
     lwqq_bit_set(ac->flag,QQ_USE_QQNUM,ac->db!=NULL);
 
 
@@ -264,13 +264,13 @@ void QQAccount::destoryLwqqAccount()
 
     printf("will close qq\n");
     if (m_lc == NULL)
-      return;
+        return;
     qq_account* ac = (qq_account *)(m_lc->data);
     LwqqErrorCode err;
 
     if(lwqq_client_logined(ac->qq))
         lwqq_logout(ac->qq,&err);
-    lwqq_msglist_close(ac->qq->msg_list); 
+    lwqq_msglist_close(ac->qq->msg_list);
     m_lc = NULL;
 }
 
@@ -299,101 +299,101 @@ void QQAccount::logout()
 
 void QQAccount::slotReceivedInstanceSignal(CallbackObject cb)
 {
-  /*call need_verify2 function*/
-  if(cb.fun_t == NEED_VERIFY2)
-  {
-    LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-    LwqqVerifyCode* code = (LwqqVerifyCode*) (cb.ptr2);
-    this->ac_need_verify2(lc, code);
-  }
-  else if(cb.fun_t == LOGIN_COMPLETE)
-  {
-    LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-    LwqqErrorCode *err = (LwqqErrorCode *)(cb.ptr2);
-    this->ac_login_stage_1(lc, err);
-  }
-  else if(cb.fun_t == LOGIN_STAGE_2)
-  {
-    LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-    LwqqAsyncEvent *ev = (LwqqAsyncEvent *)(cb.ptr2);
-    this->ac_login_stage_2(ev,lc);
-  }
-  else if(cb.fun_t == LOGIN_STAGE_3)
-  {
-    LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-    this->ac_login_stage_3(lc);
-  }
-  else if(cb.fun_t == LOGIN_STAGE_f)
-  {
-    LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-    this->ac_login_stage_f(lc);
-  }
-  else if (cb.fun_t == FRIEND_AVATAR)
-  {
-    LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-    LwqqBuddy *buddy = (LwqqBuddy*)(cb.ptr2);
-    this->ac_friend_avatar(lc, buddy);
-  }
-  else if(cb.fun_t == GROUP_AVATAR)
-  {
-    LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-    LwqqGroup *group = (LwqqGroup*)(cb.ptr2);
-    this->ac_group_avatar(lc, group);
-  }
-  else if(cb.fun_t == GROUP_MEMBERS)
-  {
-    LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-    LwqqGroup *group = (LwqqGroup*)(cb.ptr2);
-    this->ac_group_members(lc, group);
-  }
-  else if (cb.fun_t == QQ_MSG_CHECK)
-  {
-    LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-    this->ac_qq_msg_check(lc);
-  }else if(cb.fun_t == SHOW_CONFIRM)
-  {
-      LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-      LwqqConfirmTable *table = (LwqqConfirmTable*)(cb.ptr2);
-      add_info *info = (add_info*)(cb.ptr3);
-      this->ac_show_confirm_table(lc, table, info);
-  }else if(cb.fun_t == SHOW_MESSAGE)
-  {
-      msg_type type = cb.type;
-      const char *title = (const char*)(cb.ptr1);
-      const char *msg = (const char *)(cb.ptr2);
-      this->ac_show_messageBox(type, title, msg);
-  }else if(cb.fun_t == FRIEND_COME)
-  {
-      LwqqClient *lc = (LwqqClient*)(cb.ptr1);
-      LwqqBuddy *buddy = (LwqqBuddy*)(cb.ptr2);
-      this->ac_friend_come(lc, buddy);
-  }else if(cb.fun_t == REWRITE_MSG)
-  {
-      LwqqAsyncEvent* ev = (LwqqAsyncEvent*)(cb.ptr1);
-      qq_account* ac = (qq_account*)(cb.ptr2);
-      LwqqGroup* group = (LwqqGroup*)(cb.ptr3);
-      this->ac_rewrite_whole_message_list(ev, ac, group);
-  }else if(cb.fun_t == SET_GROUPNAME)
-  {
-      LwqqGroup* group = (LwqqGroup*)(cb.ptr1);
-      this->ac_qq_set_group_name(group);
-  }else if(cb.fun_t == GET_USERINFO)
-  {
-      qq_account* ac = (qq_account*)(cb.ptr1);
-      LwqqBuddy* buddy = (LwqqBuddy*)(cb.ptr2);
-      char *who = (char*)(cb.ptr3);
-      this->ac_display_user_info(ac, buddy, who);
-  }
-  
-  
-  /*add function here*/
-  
-  /*
+    /*call need_verify2 function*/
+    if(cb.fun_t == NEED_VERIFY2)
+    {
+        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
+        LwqqVerifyCode* code = (LwqqVerifyCode*) (cb.ptr2);
+        this->ac_need_verify2(lc, code);
+    }
+    else if(cb.fun_t == LOGIN_COMPLETE)
+    {
+        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
+        LwqqErrorCode *err = (LwqqErrorCode *)(cb.ptr2);
+        this->ac_login_stage_1(lc, err);
+    }
+    else if(cb.fun_t == LOGIN_STAGE_2)
+    {
+        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
+        LwqqAsyncEvent *ev = (LwqqAsyncEvent *)(cb.ptr2);
+        this->ac_login_stage_2(ev,lc);
+    }
+    else if(cb.fun_t == LOGIN_STAGE_3)
+    {
+        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
+        this->ac_login_stage_3(lc);
+    }
+    else if(cb.fun_t == LOGIN_STAGE_f)
+    {
+        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
+        this->ac_login_stage_f(lc);
+    }
+    else if (cb.fun_t == FRIEND_AVATAR)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        LwqqBuddy *buddy = (LwqqBuddy*)(cb.ptr2);
+        this->ac_friend_avatar(lc, buddy);
+    }
+    else if(cb.fun_t == GROUP_AVATAR)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        LwqqGroup *group = (LwqqGroup*)(cb.ptr2);
+        this->ac_group_avatar(lc, group);
+    }
+    else if(cb.fun_t == GROUP_MEMBERS)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        LwqqGroup *group = (LwqqGroup*)(cb.ptr2);
+        this->ac_group_members(lc, group);
+    }
+    else if (cb.fun_t == QQ_MSG_CHECK)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        this->ac_qq_msg_check(lc);
+    }else if(cb.fun_t == SHOW_CONFIRM)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        LwqqConfirmTable *table = (LwqqConfirmTable*)(cb.ptr2);
+        add_info *info = (add_info*)(cb.ptr3);
+        this->ac_show_confirm_table(lc, table, info);
+    }else if(cb.fun_t == SHOW_MESSAGE)
+    {
+        msg_type type = cb.type;
+        const char *title = (const char*)(cb.ptr1);
+        const char *msg = (const char *)(cb.ptr2);
+        this->ac_show_messageBox(type, title, msg);
+    }else if(cb.fun_t == FRIEND_COME)
+    {
+        LwqqClient *lc = (LwqqClient*)(cb.ptr1);
+        LwqqBuddy *buddy = (LwqqBuddy*)(cb.ptr2);
+        this->ac_friend_come(lc, buddy);
+    }else if(cb.fun_t == REWRITE_MSG)
+    {
+        LwqqAsyncEvent* ev = (LwqqAsyncEvent*)(cb.ptr1);
+        qq_account* ac = (qq_account*)(cb.ptr2);
+        LwqqGroup* group = (LwqqGroup*)(cb.ptr3);
+        this->ac_rewrite_whole_message_list(ev, ac, group);
+    }else if(cb.fun_t == SET_GROUPNAME)
+    {
+        LwqqGroup* group = (LwqqGroup*)(cb.ptr1);
+        this->ac_qq_set_group_name(group);
+    }else if(cb.fun_t == GET_USERINFO)
+    {
+        qq_account* ac = (qq_account*)(cb.ptr1);
+        LwqqBuddy* buddy = (LwqqBuddy*)(cb.ptr2);
+        char *who = (char*)(cb.ptr3);
+        this->ac_display_user_info(ac, buddy, who);
+    }
+
+
+    /*add function here*/
+
+    /*
   else if(cb.fun_t == XXX)
   {
   }
   */
-  
+
 }
 
 bool QQAccount::createContact(const QString &contactId, Kopete::MetaContact *parentContact)
@@ -402,10 +402,10 @@ bool QQAccount::createContact(const QString &contactId, Kopete::MetaContact *par
     {
         // FIXME: New Contacts are NOT added to KABC, because:
         // How on earth do you tell if a contact is being deserialised or added brand new here?
-            // -- actualy (oct 2004) this method is only called when new contact are added.  but this will
-            //    maybe change and you will be noticed   --Olivier
+        // -- actualy (oct 2004) this method is only called when new contact are added.  but this will
+        //    maybe change and you will be noticed   --Olivier
         QQContact *newContact = new QQContact( this, contactId,
-                                                     parentContact->displayName(), parentContact );
+                                               parentContact->displayName(), parentContact );
         return newContact != 0;
     }
     else
@@ -423,10 +423,10 @@ bool QQAccount::createChatSessionContact(const QString &id, const QString &name)
     {
         // FIXME: New Contacts are NOT added to KABC, because:
         // How on earth do you tell if a contact is being deserialised or added brand new here?
-            // -- actualy (oct 2004) this method is only called when new contact are added.  but this will
-            //    maybe change and you will be noticed   --Olivier
+        // -- actualy (oct 2004) this method is only called when new contact are added.  but this will
+        //    maybe change and you will be noticed   --Olivier
         QQContact *newContact = new QQContact( this, id,
-                                                     name, m );
+                                               name, m );
         return newContact != 0;
     }
     else
@@ -448,7 +448,7 @@ void QQAccount::buddy_message(LwqqClient* lc,LwqqMsgMessage* msg)
     /*find the contact*/
     QQContact * contact = dynamic_cast<QQContact *>(contacts().value( QString(buddy->qqnumber) ));
     if ( !contact)
-	return;
+        return;
     
     contact->receivedMessage(stransMsg(QString::fromUtf8(buf)));
     
@@ -756,8 +756,8 @@ void QQAccount::whisper_message(LwqqClient *lc, LwqqMsgMessage *mmsg)
 void QQAccount::ac_qq_msg_check(LwqqClient *lc)
 {
     //printf("[%s] start\n", __FUNCTION__);
-    if(!lwqq_client_valid(lc)) 
-      return;
+    if(!lwqq_client_valid(lc))
+        return;
     LwqqRecvMsgList* l = lc->msg_list;
     LwqqRecvMsg *msg,*prev;
     LwqqMsgSystem* sys_msg;
@@ -775,20 +775,20 @@ void QQAccount::ac_qq_msg_check(LwqqClient *lc)
             switch(lwqq_mt_bits(msg->msg->type)) {
             case LWQQ_MT_MESSAGE:
                 switch(msg->msg->type){
-                    case LWQQ_MS_BUDDY_MSG:
-			//printf("this is a message\n");
-                        buddy_message(lc,(LwqqMsgMessage*)msg->msg);
-                        break;
-                    case LWQQ_MS_GROUP_MSG:
-                    case LWQQ_MS_DISCU_MSG:
-                    case LWQQ_MS_GROUP_WEB_MSG:
-                        group_message(lc,(LwqqMsgMessage*)msg->msg);
-                        break;
-                    case LWQQ_MS_SESS_MSG:
-                        whisper_message(lc,(LwqqMsgMessage*)msg->msg);
-                        break;
-                    default: 
-			break;
+                case LWQQ_MS_BUDDY_MSG:
+                    //printf("this is a message\n");
+                    buddy_message(lc,(LwqqMsgMessage*)msg->msg);
+                    break;
+                case LWQQ_MS_GROUP_MSG:
+                case LWQQ_MS_DISCU_MSG:
+                case LWQQ_MS_GROUP_WEB_MSG:
+                    group_message(lc,(LwqqMsgMessage*)msg->msg);
+                    break;
+                case LWQQ_MS_SESS_MSG:
+                    whisper_message(lc,(LwqqMsgMessage*)msg->msg);
+                    break;
+                default:
+                    break;
                 }
                 break;
             case LWQQ_MT_STATUS_CHANGE:
@@ -806,9 +806,9 @@ void QQAccount::ac_qq_msg_check(LwqqClient *lc)
                     msg->msg = NULL;
                     LwqqBuddy* buddy = lwqq_buddy_new();
                     LwqqAsyncEvent* ev = lwqq_info_get_stranger_info(
-                            lc, sys_msg->super.from, buddy);
+                                lc, sys_msg->super.from, buddy);
                     lwqq_async_add_event_listener(ev,
-                            _C_(3p,system_message,lc,sys_msg,buddy));
+                                                  _C_(3p,system_message,lc,sys_msg,buddy));
                 }else{
                     system_message(lc,(LwqqMsgSystem*)msg->msg,NULL);
                 }
@@ -861,7 +861,7 @@ void QQAccount::ac_qq_msg_check(LwqqClient *lc)
         }
     }
     pthread_mutex_unlock(&l->mutex);
-    return ;  
+    return ;
 }
 
 void QQAccount::blist_change(LwqqClient *lc, LwqqMsgBlistChange *blist)
@@ -884,16 +884,13 @@ void QQAccount::blist_change(LwqqClient *lc, LwqqMsgBlistChange *blist)
             friend_come(lc, buddy);
         }
     }
-//    LIST_FOREACH(buddy,&blist->removed_friends,entries){
-
-//    }
 }
 
 void QQAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
 {   
     QByteArray bytearry(buddy->avatar, buddy->avatar_len);
     kDebug(WEBQQ_GEN_DEBUG)<<"buddy qqname:"<<QString::fromUtf8(buddy->qqnumber)<<"uin:"<<QString::fromUtf8(buddy->uin);
-    /*find out the contact*/ 
+    /*find out the contact*/
     //kDebug(WEBQQ_GEN_DEBUG)<<"find out the contact";
     if(QString(buddy->qqnumber) == myself()->contactId())
     {
@@ -923,14 +920,14 @@ void QQAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
         QString displayName;
         if (buddy->markname != NULL)
         {
-          displayName = QString::fromUtf8(buddy->markname);
+            displayName = QString::fromUtf8(buddy->markname);
         }
         else
         {
-        if (QString(buddy->nick).length() == 0)
-            displayName = QString::fromUtf8(buddy->qqnumber);
-        else
-            displayName = QString::fromUtf8(buddy->nick);
+            if (QString(buddy->nick).length() == 0)
+                displayName = QString::fromUtf8(buddy->qqnumber);
+            else
+                displayName = QString::fromUtf8(buddy->nick);
         }
         /*first set its stat*/
         Kopete::OnlineStatus qqStatus = statusFromLwqqStatus(buddy->stat);
@@ -963,9 +960,9 @@ void QQAccount::ac_group_avatar(LwqqClient *lc, LwqqGroup *group)
     kDebug(WEBQQ_GEN_DEBUG)<<"find out the contact";
     QQContact * contact = dynamic_cast<QQContact *>(contacts().value( QString(group->gid) ));
     if ( !contact)
-    return;
+        return;
 
-   contact->setContactType(Contact_Group);
+    contact->setContactType(Contact_Group);
 
     /*first set its stat*/
     //Kopete::OnlineStatus qqStatus = statusFromLwqqStatus(buddy->stat);
@@ -975,12 +972,12 @@ void QQAccount::ac_group_avatar(LwqqClient *lc, LwqqGroup *group)
     kDebug(WEBQQ_GEN_DEBUG) <<"contact icon:" << bytearry.size();
     if (!bytearry.isEmpty())
     {
-      contact->setDisplayPicture(bytearry);
+        contact->setDisplayPicture(bytearry);
     }else{
 
-//        kDebug(WEBQQ_GEN_DEBUG)<<"avatarData size:" << avatarData.size();
-//        //QFile::remove(filename);
-//        contact->setDisplayPicture(avatarData);
+        //        kDebug(WEBQQ_GEN_DEBUG)<<"avatarData size:" << avatarData.size();
+        //        //QFile::remove(filename);
+        //        contact->setDisplayPicture(avatarData);
     }
 }
 
@@ -1009,7 +1006,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                 if((buddy = find_buddy_by_uin(lc,member->uin))) {
                     if(contact(QString(buddy->qqnumber)))
                     {
-                         contact(g_id)->qq_addcontacts(contact(QString(buddy->qqnumber)));
+                        contact(g_id)->qq_addcontacts(contact(QString(buddy->qqnumber)));
                     }else if(contact(QString(buddy->uin)))
                     {
                         contact(g_id)->qq_addcontacts(contact(QString(buddy->uin)));
@@ -1103,8 +1100,8 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
             contactName = QString::fromUtf8(member->card);
         else
             contactName = QString::fromUtf8(member->nick);
-//        kDebug(WEBQQ_GEN_DEBUG)<<"groupname:"<<contactName<<"qq:"<<QString(member->uin)<<QString(group->gid);
-//        kDebug(WEBQQ_GEN_DEBUG)<<"clientid:"<<QString(lc->clientid)<<"uin"<<QString(lc->myself->uin);
+        //        kDebug(WEBQQ_GEN_DEBUG)<<"groupname:"<<contactName<<"qq:"<<QString(member->uin)<<QString(group->gid);
+        //        kDebug(WEBQQ_GEN_DEBUG)<<"clientid:"<<QString(lc->clientid)<<"uin"<<QString(lc->myself->uin);
         if(strcmp(lc->myself->uin, member->uin) != 0)
         {
             if((buddy = find_buddy_by_uin(lc,member->uin))) {
@@ -1161,7 +1158,7 @@ void QQAccount::ac_need_verify2(LwqqClient* lc, LwqqVerifyCode* code)
 {
     //printf("[%s] \n", __FUNCTION__);
     const char *dir = "/tmp/kopete-qq/";
-   // char fname[50];
+    // char fname[50];
     //snprintf(fname,sizeof(fname),"%s.gif",lc->username);
     lwqq_util_save_img(code->data,code->size,lc->username,dir);
     LoginVerifyDialog *dlg = new LoginVerifyDialog();
@@ -1199,30 +1196,6 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
 
         //afterLogin(lc);
         break;
-//    case LWQQ_EC_ERROR: /*error verify code or error password or error username*/
-//        //printf("err msg: %s\n",lc->last_err);
-//        if (strncmp(lc->last_err, "Wrong username or password", strlen("Wrong username or password")) == 0)
-//        {
-//            password().setWrong();
-//            /*this is very ugly, since we need user to reinput verfy code*/
-//            message = i18n( "Password Error!");
-//            KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-//            //KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
-//        }
-//        else if (strncmp(lc->last_err, "Wrong verify code", strlen("Wrong verify code")) == 0)
-//        {
-//            /*this is very ugly, since we need user to reinput verfy code*/
-//            lc->vc = NULL;
-//            message = i18n( "Verify Code Error!");
-//            KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-//            //KNotification::event( "Connect failed", message, myself()->onlineStatus().protocolIcon(KIconLoader::SizeMedium) );
-//        }else
-//        {
-//            KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, i18n(lc->last_err));
-//        }
-//        myself()->setOnlineStatus( m_protocol->QQOffline);
-//        disconnected( Manual );			// don't reconnect
-//        return;
     case LWQQ_EC_LOGIN_ABNORMAL:
         disconnected( Manual );			// don't reconnect
         message = i18n( "Login Abnormal!");
@@ -1251,7 +1224,7 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
         return;
     }
 
-//    ac->state = CONNECTED;
+    //    ac->state = CONNECTED;
     LwqqAsyncEvent* ev = lwqq_info_get_friends_info(lc, NULL, NULL);
     lwqq_async_add_event_listener(ev, _C_(p,friends_valid_hash,ev));
     return ;
@@ -1259,13 +1232,13 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
 
 void QQAccount::pollMessage()
 {
-  if(!m_lc)
-    return;
-  
-  LwqqRecvMsgList *msgList = lwqq_msglist_new(m_lc);
+    if(!m_lc)
+        return;
 
-  lwqq_msglist_poll(msgList, POLL_AUTO_DOWN_BUDDY_PIC);
-  //lwqq_msglist_free(msgList);
+    LwqqRecvMsgList *msgList = lwqq_msglist_new(m_lc);
+
+    lwqq_msglist_poll(msgList, POLL_AUTO_DOWN_BUDDY_PIC);
+    //lwqq_msglist_free(msgList);
 
 }
 
@@ -1298,7 +1271,7 @@ void QQAccount::ac_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
     ev = lwqq_info_get_friend_detail_info(lc,lc->myself);
     lwqq_async_evset_add_event(set,ev);
     lwqq_async_add_evset_listener(set,_C_(p,cb_login_stage_3,lc));
-     
+
 }
 
 void QQAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
@@ -1309,15 +1282,15 @@ void QQAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
 
     if(cate_index == LWQQ_FRIEND_CATE_IDX_PASSERBY)
     {
-	categoryName = QString("Passerby");
+        categoryName = QString("Passerby");
     }
     else
     {
         LIST_FOREACH(cate,&lc->categories,entries)
-	{
-            if(cate->index==cate_index) 
-	    {
-		categoryName = QString::fromUtf8(cate->name);
+        {
+            if(cate->index==cate_index)
+            {
+                categoryName = QString::fromUtf8(cate->name);
                 break;
             }
         }
@@ -1329,31 +1302,31 @@ void QQAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
     
     foreach(g, groupList)
     {
-	if(g->displayName() == categoryName)
-	{
-	  targetGroup = g;
-	  break;
-	}
+        if(g->displayName() == categoryName)
+        {
+            targetGroup = g;
+            break;
+        }
     }
     /*if not found this group, add a new group*/
     if (targetGroup == NULL)
     {
-      targetGroup = new Kopete::Group(categoryName);
-      Kopete::ContactList::self()->addGroup( targetGroup );  
+        targetGroup = new Kopete::Group(categoryName);
+        Kopete::ContactList::self()->addGroup( targetGroup );
     }
     
     /*get buddy's display name*/
     QString displayName;
     if (buddy->markname != NULL)
     {
-      displayName = QString::fromUtf8(buddy->markname);
+        displayName = QString::fromUtf8(buddy->markname);
     }
     else
     {
-	if (QString(buddy->nick).length() == 0)
-	    displayName = QString::fromUtf8(buddy->qqnumber);
-	else
-	    displayName = QString::fromUtf8(buddy->nick); 
+        if (QString(buddy->nick).length() == 0)
+            displayName = QString::fromUtf8(buddy->qqnumber);
+        else
+            displayName = QString::fromUtf8(buddy->nick);
     }
     
     //this is avaliable when reload avatar in
@@ -1364,24 +1337,16 @@ void QQAccount::friend_come(LwqqClient* lc,LwqqBuddy* buddy)
     }
     else
     {
-        LwqqAsyncEvset* set = lwqq_async_evset_new();
-        LwqqAsyncEvent* ev;
-        //download avatar
-        ev = lwqq_info_get_friend_avatar(lc,buddy);
-        lwqq_async_evset_add_event(set,ev);
-        //	ev = lwqq_info_get_friend_detail_info(lc, buddy);/*get detail of friend*/
-        //	lwqq_async_evset_add_event(set,ev);
-
-        lwqq_async_add_evset_listener(set,_C_(2p,cb_friend_avatar, lc, buddy));
-        //lwqq_async_add_event_listener(ev,_C_(2p,cb_friend_avatar, lc, buddy));
+        LwqqAsyncEvent* ev = lwqq_info_get_friend_avatar(lc,buddy);
+        lwqq_async_add_event_listener(ev,_C_(2p,cb_friend_avatar,lc,buddy));
     }
-//    if(contact(QString(buddy->qqnumber)))
-//        fprintf(stderr, "contact %s\n", contact(QString(buddy->qqnumber))->property(Kopete::Global::Properties::self()->photo()).tmpl().icon().toUtf8().data());
+    //    if(contact(QString(buddy->qqnumber)))
+    //        fprintf(stderr, "contact %s\n", contact(QString(buddy->qqnumber))->property(Kopete::Global::Properties::self()->photo()).tmpl().icon().toUtf8().data());
 
-//    if(Kopete::AvatarManager::self()->exists(QString(buddy->qqnumber)))
-//        fprintf(stderr, "AvatarManager exists\n");
+    //    if(Kopete::AvatarManager::self()->exists(QString(buddy->qqnumber)))
+    //        fprintf(stderr, "AvatarManager exists\n");
     addContact( QString(buddy->qqnumber), displayName,  targetGroup, Kopete::Account::ChangeKABC );
-  
+
 }
 
 void QQAccount::initCategory()
@@ -1396,16 +1361,16 @@ void QQAccount::initCategory()
     
     foreach(g, groupList)
     {
-	Kopete::ContactList::self()->removeGroup( g );
+        Kopete::ContactList::self()->removeGroup( g );
     }
-     
+
     /*add new group*/
     LIST_FOREACH(cate,&m_lc->categories,entries) {
-		QString groupName = QString::fromUtf8(cate->name);;
-                newGroup = new Kopete::Group(groupName);
-		Kopete::ContactList::self()->addGroup( newGroup );      
+        QString groupName = QString::fromUtf8(cate->name);;
+        newGroup = new Kopete::Group(groupName);
+        Kopete::ContactList::self()->addGroup( newGroup );
     }
-   
+
 
 }
 
@@ -1421,12 +1386,12 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
     msgList.clear();
     if(group->type == LWQQ_GROUP_QUN)
     {
-        categoryName = QString("Group");
+        categoryName = i18n("Group");
         m_msgMap.insert(QString(group->gid), msgList);
     }
-    else
+    else  if(group->type == LWQQ_GROUP_DISCU)
     {
-        categoryName = QString("Discussion");
+        categoryName = i18n("Discussion");
         m_msgMap.insert(QString(group->did), msgList);
     }
 
@@ -1435,31 +1400,31 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
     Kopete::Group *targetGroup = NULL;
     foreach(g, groupList)
     {
-    if(g->displayName() == categoryName)
-    {
-      targetGroup = g;
-      break;
-    }
+        if(g->displayName() == categoryName)
+        {
+            targetGroup = g;
+            break;
+        }
     }
     /*if not found this group, add a new group*/
     if (targetGroup == NULL)
     {
-      targetGroup = new Kopete::Group(categoryName);
-      Kopete::ContactList::self()->addGroup( targetGroup );
+        targetGroup = new Kopete::Group(categoryName);
+        Kopete::ContactList::self()->addGroup( targetGroup );
     }
 
     /*get buddy's display name*/
     QString displayName;
     if (group->markname != NULL)
     {
-      displayName = QString::fromUtf8(group->markname);
+        displayName = QString::fromUtf8(group->markname);
     }
     else
     {
-    if (QString(group->name).length() == 0)
-        displayName = QString::fromUtf8(group->gid);
-    else
-        displayName = QString::fromUtf8(group->name);
+        if (QString(group->name).length() == 0)
+            displayName = QString::fromUtf8(group->gid);
+        else
+            displayName = QString::fromUtf8(group->name);
     }
 
     //this is avaliable when reload avatar in
@@ -1470,19 +1435,15 @@ void QQAccount::group_come(LwqqClient* lc,LwqqGroup* group)
     }
     else
     {
-        LwqqAsyncEvset* set = lwqq_async_evset_new();
-        LwqqAsyncEvent* ev;
-        //download avatar
-        ev = lwqq_info_get_group_avatar(lc,group);
-        lwqq_async_evset_add_event(set,ev);
-        lwqq_async_add_evset_listener(set,_C_(2p,cb_group_avatar, lc, group));
+        LwqqAsyncEvent* ev = lwqq_info_get_group_avatar(lc,group);
+        lwqq_async_add_event_listener(ev,_C_(2p,cb_group_avatar,lc,group));
 
     }
     if(group->type == LWQQ_GROUP_QUN)
     {
         addContact( QString(group->gid), displayName,  targetGroup, Kopete::Account::ChangeKABC );
         if(!contact(QString(group->gid)))
-                return;
+            return;
         QObject::connect(contact(QString(group->gid)) , SIGNAL(getGroupMembersSignal(QString)), \
                          this, SLOT(slotGetGroupMembers(QString)));
         QObject::connect(contact(QString(group->gid)) , SIGNAL(blockSignal(QString)), this, SLOT(slotBlock(QString)));
@@ -1510,11 +1471,8 @@ void QQAccount::slotGetGroupMembers(QString id)
         return;
     if(LIST_EMPTY(&group->members))
     {
-        LwqqAsyncEvent* ev;
-        LwqqAsyncEvset* set = lwqq_async_evset_new();
-        ev = lwqq_info_get_group_detail_info(m_lc, group, NULL);/*get detail of friend*/
-        lwqq_async_evset_add_event(set,ev);
-        lwqq_async_add_evset_listener(set,_C_(2p,cb_group_members, m_lc, group));
+        LwqqAsyncEvent* ev = lwqq_info_get_group_detail_info(m_lc, group, NULL);;
+        lwqq_async_add_event_listener(ev,_C_(2p,cb_group_members,m_lc,group));
     }
     if(m_msgMap[id].size() > 0)
     {
@@ -1528,8 +1486,8 @@ void QQAccount::discu_come(LwqqClient *lc, LwqqGroup *group)
 }
 void QQAccount::ac_login_stage_3(LwqqClient* lc)
 {
-
-  qq_account* ac = (qq_account*)lwqq_client_userdata(lc);
+    kDebug(WEBQQ_GEN_DEBUG)<<"ac_login_stage_3";
+    qq_account* ac = (qq_account*)lwqq_client_userdata(lc);
 
 
 
@@ -1574,7 +1532,7 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
         //LwqqAsyncEvset* set = NULL;
         lwdb_userdb_query_group(ac->db, group);
         if((ac->flag && 1)&& ! group->account){ //QQ_USE_QQNUM = 1
-	  
+
             ev = lwqq_info_get_group_qqnumber(lc,group);
             lwqq_async_evset_add_event(set, ev);
         }
@@ -1588,28 +1546,6 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
         if(group->last_modify != -1 && group->last_modify != 0)
             group_come(lc,group);
     }
-
-    //after this we finished the qqnumber fast index.
-
-    //we should always put discu after group deletion.
-    //to avoid delete discu list.
-//    LwqqGroup* discu;
-//    if(ac->flag&CACHE_TALKGROUP){
-//        LIST_FOREACH(discu,&lc->discus,entries){
-//            if(!discu->account||discu->last_modify==-1){
-//                ev = lwqq_info_get_discu_detail_info(lc, discu);
-//                lwqq_async_evset_add_event(set, ev);
-//            }
-//            if(discu->last_modify!=-1){
-//                discu_come(lc,discu);
-//            }
-//        }
-//    }else{
-//        LIST_FOREACH(discu,&lc->discus,entries){
-//            lwqq_override(discu->account, s_strdup(discu->did));
-//            discu_come(lc, discu);
-//        }
-//    }
 
     LwqqGroup* discu;
     LIST_FOREACH(discu,&lc->discus,entries){
@@ -1632,6 +1568,7 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
 
 void QQAccount::ac_login_stage_f(LwqqClient* lc)
 {
+    kDebug(WEBQQ_GEN_DEBUG)<<"ac_login_stage_f";
     LwqqBuddy* buddy;
     LwqqGroup* group,*discu;
     qq_account* ac = (qq_account*)lc->data;
@@ -1648,15 +1585,6 @@ void QQAccount::ac_login_stage_f(LwqqClient* lc)
             group_come(lc,group);
         }
     }
-//    if(ac->flag & CACHE_TALKGROUP){
-//        LIST_FOREACH(discu,&lc->discus,entries){
-//            if(discu->last_modify==-1){
-//                lwqq_override(discu->account, s_strdup(discu->info_seq));
-//                lwdb_userdb_insert_discu_info(ac->db, discu);
-//                discu_come(lc,discu);
-//            }
-//        }
-//    }
     lwdb_userdb_commit(ac->db);
     myself()->setOnlineStatus( m_targetStatus );
 
@@ -1674,98 +1602,98 @@ void QQAccount::ac_login_stage_f(LwqqClient* lc)
 
 void QQAccount::setStatusMessage(const Kopete::StatusMessage& statusMessage)
 {
-	Q_UNUSED(statusMessage);
+    Q_UNUSED(statusMessage);
     /* Not used in qq */
 }
 
 #if 0
 void QQAccount::connect( const Kopete::OnlineStatus& /* initialStatus */ )
 {
-	kDebug ( 14210 ) ;
+    kDebug ( 14210 ) ;
     //myself()->setOnlineStatus( QQProtocol::protocol()->qqOnline );
-	login();
-	QObject::connect ( m_server, SIGNAL (messageReceived(QString)),
-			this, SLOT (receivedMessage(QString)) );
+    login();
+    QObject::connect ( m_server, SIGNAL (messageReceived(QString)),
+                       this, SLOT (receivedMessage(QString)) );
 }
 #endif
 
 void QQAccount::connectWithPassword( const QString &passwd )
 {
-	
-	if ( isAway() )
-	{
-		slotGoOnline();
-		return;
-	}
 
-	if ( isConnected() ||
+    if ( isAway() )
+    {
+        slotGoOnline();
+        return;
+    }
+
+    if ( isConnected() ||
          myself()->onlineStatus() == m_protocol->QQConnecting )
-	{
-		return;
+    {
+        return;
 
-	}
-	
-	/*
-	 * Fixed Bug: first login after create account
-	 * 
-	 */
-	if (m_targetStatus == Kopete::OnlineStatus::Offline)
-	{
-	  m_targetStatus = Kopete::OnlineStatus::Online;
-	  slotGoOnline();
-	  return;
-	}
+    }
 
-	if ( passwd.isNull() )
-	{ //cancel the connection attempt
+    /*
+     * Fixed Bug: first login after create account
+     *
+     */
+    if (m_targetStatus == Kopete::OnlineStatus::Offline)
+    {
+        m_targetStatus = Kopete::OnlineStatus::Online;
+        slotGoOnline();
+        return;
+    }
+
+    if ( passwd.isNull() )
+    { //cancel the connection attempt
         static_cast<QQContact*>( myself() )->setOnlineStatus( m_protocol->QQOffline );
-		return;
-	}
+        return;
+    }
 
-	
+
     static_cast<QQContact *>( myself() )->setOnlineStatus( m_protocol->QQConnecting );
-	
 
-	/*
-	 * !Urgly, 
-	 *change lwqqclient username and password
-	*/
-	if(m_lc == NULL)
-	    initLwqqAccount();
-	
-	s_free(m_lc->username);
-	s_free(m_lc->password);
-	m_lc->username = s_strdup(accountId().toAscii().constData());
-	m_lc->password = s_strdup(passwd.toAscii().constData());
 
-	/*first get the connect type*/
-	LwqqStatus targetLwqqStatus;
-	if (m_targetStatus == Kopete::OnlineStatus::Online)
-	{
-	  targetLwqqStatus = LWQQ_STATUS_ONLINE;
-	}
-	else if(m_targetStatus == Kopete::OnlineStatus::Away)
-	{
-	  targetLwqqStatus = LWQQ_STATUS_AWAY;
-	}
-	else if(m_targetStatus == Kopete::OnlineStatus::Busy)
-	  targetLwqqStatus = LWQQ_STATUS_BUSY;
-	else if(m_targetStatus == Kopete::OnlineStatus::Invisible)
-	  targetLwqqStatus = LWQQ_STATUS_HIDDEN;
-	else
-	{
-	  targetLwqqStatus = LWQQ_STATUS_ONLINE;
-	}
-	
-	/*try to connect to lwqq*/
+    /*
+     * !Urgly,
+     *change lwqqclient username and password
+    */
+    if(m_lc == NULL)
+        initLwqqAccount();
+
+    s_free(m_lc->username);
+    s_free(m_lc->password);
+    m_lc->username = s_strdup(accountId().toAscii().constData());
+    m_lc->password = s_strdup(passwd.toAscii().constData());
+
+    /*first get the connect type*/
+    LwqqStatus targetLwqqStatus;
+    if (m_targetStatus == Kopete::OnlineStatus::Online)
+    {
+        targetLwqqStatus = LWQQ_STATUS_ONLINE;
+    }
+    else if(m_targetStatus == Kopete::OnlineStatus::Away)
+    {
+        targetLwqqStatus = LWQQ_STATUS_AWAY;
+    }
+    else if(m_targetStatus == Kopete::OnlineStatus::Busy)
+        targetLwqqStatus = LWQQ_STATUS_BUSY;
+    else if(m_targetStatus == Kopete::OnlineStatus::Invisible)
+        targetLwqqStatus = LWQQ_STATUS_HIDDEN;
+    else
+    {
+        targetLwqqStatus = LWQQ_STATUS_ONLINE;
+    }
+
+    /*try to connect to lwqq*/
     lwqq_get_http_handle(m_lc)->ssl = 0;
-	LwqqErrorCode err;
-//    Kopete::AvatarQueryJob *queryJob = new Kopete::AvatarQueryJob(this);
-//    queryJob->setQueryFilter(Kopete::AvatarManager::All);
-//    QObject::connect(queryJob, SIGNAL(result(KJob*)), this, SLOT(queryResult(KJob*)));
-//    queryJob->start();
+    LwqqErrorCode err;
+    //    Kopete::AvatarQueryJob *queryJob = new Kopete::AvatarQueryJob(this);
+    //    queryJob->setQueryFilter(Kopete::AvatarManager::All);
+    //    QObject::connect(queryJob, SIGNAL(result(KJob*)), this, SLOT(queryResult(KJob*)));
+    //    queryJob->start();
     lwqq_login(m_lc, targetLwqqStatus, NULL);
-	
+
 }
 
 bool QQAccount::isOffline()
@@ -1778,13 +1706,13 @@ bool QQAccount::isOffline()
 
 void QQAccount::disconnect()
 {
-	kDebug ( 14210 ) ;
-	//logout();
-	
-	//pollTimer->stop();
-	//QObject::disconnect(pollTimer, 0, 0, 0);
-	destoryLwqqAccount();/*destory this lwqq client*/
-	
+    kDebug ( 14210 ) ;
+    //logout();
+
+    //pollTimer->stop();
+    //QObject::disconnect(pollTimer, 0, 0, 0);
+    destoryLwqqAccount();/*destory this lwqq client*/
+
     myself()->setOnlineStatus( m_protocol->QQOffline );
 
 }
@@ -1792,110 +1720,110 @@ void QQAccount::disconnect()
 
 void QQAccount::slotGoOnline ()
 {
-	kDebug ( 14210 ) ;
-	if (!isConnected ())
-	{
-		connect ();
-	}
-	else
-	{
+    kDebug ( 14210 ) ;
+    if (!isConnected ())
+    {
+        connect ();
+    }
+    else
+    {
         myself()->setOnlineStatus( m_protocol->QQOnline );
-		lwqq_info_change_status(m_lc, LWQQ_STATUS_ONLINE);
-	}
-	//updateContactStatus();
+        lwqq_info_change_status(m_lc, LWQQ_STATUS_ONLINE);
+    }
+    //updateContactStatus();
 }
 
 void QQAccount::slotGoAway ()
 {
-	kDebug ( 14210 ) ;
-	
+    kDebug ( 14210 ) ;
 
-	if (!isConnected ())		
-		connect();
-	else
-	{
+
+    if (!isConnected ())
+        connect();
+    else
+    {
         myself()->setOnlineStatus( m_protocol->QQAway );
-	    lwqq_info_change_status(m_lc, LWQQ_STATUS_AWAY);
-	}
-	//updateContactStatus();
+        lwqq_info_change_status(m_lc, LWQQ_STATUS_AWAY);
+    }
+    //updateContactStatus();
 }
 
 void QQAccount::slotGoHidden()
 {
-  	kDebug ( 14210 ) ;
+    kDebug ( 14210 ) ;
 
-	if (!isConnected ())
-		connect();
-	else
-	{
-      myself()->setOnlineStatus( m_protocol->QQHidden );
-	  lwqq_info_change_status(m_lc, LWQQ_STATUS_HIDDEN);
-	}
+    if (!isConnected ())
+        connect();
+    else
+    {
+        myself()->setOnlineStatus( m_protocol->QQHidden );
+        lwqq_info_change_status(m_lc, LWQQ_STATUS_HIDDEN);
+    }
 }
 
 
 void QQAccount::slotGoBusy ()
 {
-	kDebug ( 14210 ) ;
+    kDebug ( 14210 ) ;
 
-	if (!isConnected ())
-		connect();
-	else
-	{
-      myself()->setOnlineStatus( m_protocol->QQBusy );
-	  lwqq_info_change_status(m_lc, LWQQ_STATUS_BUSY);
-	}
-	//updateContactStatus();
+    if (!isConnected ())
+        connect();
+    else
+    {
+        myself()->setOnlineStatus( m_protocol->QQBusy );
+        lwqq_info_change_status(m_lc, LWQQ_STATUS_BUSY);
+    }
+    //updateContactStatus();
 }
 
 
 void QQAccount::slotGoOffline ()
 {
-	kDebug ( 14210 ) ;
+    kDebug ( 14210 ) ;
 
-	if (isConnected ())
-		disconnect ();
-	else
-	  updateContactStatus();
+    if (isConnected ())
+        disconnect ();
+    else
+        updateContactStatus();
 }
 
 void QQAccount::slotShowVideo ()
 {
-	kDebug ( 14210 ) ;
+    kDebug ( 14210 ) ;
 
-	if (isConnected ())
-	{
+    if (isConnected ())
+    {
         //QQWebcamDialog *qqWebcamDialog = new QQWebcamDialog(0, 0);
         //Q_UNUSED(qqWebcamDialog);
-	}
-	//updateContactStatus();
+    }
+    //updateContactStatus();
 }
 
 void QQAccount::receivedMessage( const QString &message )
 {
-	// Look up the contact the message is from
-	QString from;
+    // Look up the contact the message is from
+    QString from;
     QQContact* messageSender;
- 
-	from = message.section( ':', 0, 0 );
-	Kopete::Contact* contact = contacts().value(from);
+
+    from = message.section( ':', 0, 0 );
+    Kopete::Contact* contact = contacts().value(from);
     messageSender = dynamic_cast<QQContact *>( contact );
 
-	kWarning( 14210 ) << " got a message from " << from << ", " << messageSender << ", is: " << message;
-	// Pass it on to the contact to pocess and display via a KMM
-	if ( messageSender )
-		messageSender->receivedMessage( message );
-	else
-		kWarning(14210) << "unable to look up contact for delivery";
+    kWarning( 14210 ) << " got a message from " << from << ", " << messageSender << ", is: " << message;
+    // Pass it on to the contact to pocess and display via a KMM
+    if ( messageSender )
+        messageSender->receivedMessage( message );
+    else
+        kWarning(14210) << "unable to look up contact for delivery";
 }
 
 void QQAccount::updateContactStatus()
 {
-	QHashIterator<QString, Kopete::Contact*>itr( contacts() );
-	for ( ; itr.hasNext(); ) {
-		itr.next();
-		itr.value()->setOnlineStatus( myself()->onlineStatus() );
-	}
+    QHashIterator<QString, Kopete::Contact*>itr( contacts() );
+    for ( ; itr.hasNext(); ) {
+        itr.next();
+        itr.value()->setOnlineStatus( myself()->onlineStatus() );
+    }
 }
 
 void QQAccount::find_add_contact(const QString name, Find_Type type, QString groupName)
@@ -2050,46 +1978,46 @@ void QQAccount::slotBlock(QString id)
 
 static void cb_need_verify2(LwqqClient* lc,LwqqVerifyCode** code)
 {
-  CallbackObject cb;
-  cb.fun_t = NEED_VERIFY2;
-  cb.ptr1 = (void *)lc;
-  cb.ptr2 = (void *)(*code);
-  ObjectInstance::instance()->callSignal(cb);
+    CallbackObject cb;
+    cb.fun_t = NEED_VERIFY2;
+    cb.ptr1 = (void *)lc;
+    cb.ptr2 = (void *)(*code);
+    ObjectInstance::instance()->callSignal(cb);
 }
 
 static void cb_login_stage_1(LwqqClient* lc,LwqqErrorCode* err)
 {
-  CallbackObject cb;
-  cb.fun_t = LOGIN_COMPLETE;
-  cb.ptr1 = (void *)lc;
-  cb.ptr2= (void *)err;
-  ObjectInstance::instance()->callSignal(cb);
+    CallbackObject cb;
+    cb.fun_t = LOGIN_COMPLETE;
+    cb.ptr1 = (void *)lc;
+    cb.ptr2= (void *)err;
+    ObjectInstance::instance()->callSignal(cb);
 } 
 
 static void cb_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
 {
-  CallbackObject cb;
-  cb.fun_t = LOGIN_STAGE_2;
-  cb.ptr1 = (void *)lc;
-  cb.ptr2 = (void *)event;
-  ObjectInstance::instance()->callSignal(cb);
+    CallbackObject cb;
+    cb.fun_t = LOGIN_STAGE_2;
+    cb.ptr1 = (void *)lc;
+    cb.ptr2 = (void *)event;
+    ObjectInstance::instance()->callSignal(cb);
 }
 
 static void cb_login_stage_3(LwqqClient* lc)
 {
-  CallbackObject cb;
-  cb.fun_t = LOGIN_STAGE_3;
-  cb.ptr1 = (void *)lc;
-  fprintf(stderr, "cb_login_stage_3:%p", lc);
-  ObjectInstance::instance()->callSignal(cb);
+    CallbackObject cb;
+    cb.fun_t = LOGIN_STAGE_3;
+    cb.ptr1 = (void *)lc;
+    fprintf(stderr, "cb_login_stage_3:%p", lc);
+    ObjectInstance::instance()->callSignal(cb);
 }
 
 void cb_login_stage_f(LwqqClient* lc)
 {
-  CallbackObject cb;
-  cb.fun_t = LOGIN_STAGE_f;
-  cb.ptr1 = (void *)lc;
-  ObjectInstance::instance()->callSignal(cb);
+    CallbackObject cb;
+    cb.fun_t = LOGIN_STAGE_f;
+    cb.ptr1 = (void *)lc;
+    ObjectInstance::instance()->callSignal(cb);
 }
 
 
@@ -2211,8 +2139,8 @@ static char* hash_with_local_file(const char* uin,const char* ptqq,void* js)
 static char* hash_with_remote_file(const char* uin,const char* ptqq,void* js)
 {
     //github.com is too slow
-    qq_download("http://pidginlwqq.sinaapp.com/hash.js", 
-            "hash.js", lwdb_get_config_dir());
+    qq_download("http://pidginlwqq.sinaapp.com/hash.js",
+                "hash.js", lwdb_get_config_dir());
     return hash_with_local_file(uin, ptqq, js);
 }
 
@@ -2221,9 +2149,9 @@ static void friends_valid_hash(LwqqAsyncEvent* ev)
     LwqqClient* lc = ev->lc;
     qq_account* ac = (qq_account*)lc->data;
     if(ev->result == LWQQ_EC_HASH_WRONG){
-//        if(last_hash == hash_with_local_file){
-//            get_friends_info_retry(lc, hash_with_remote_file);
-//        }
+        //        if(last_hash == hash_with_local_file){
+        //            get_friends_info_retry(lc, hash_with_remote_file);
+        //        }
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, \
                                       i18n("Hash Function Wrong, Please try again later or report to author"));
         return;
@@ -2233,9 +2161,9 @@ static void friends_valid_hash(LwqqAsyncEvent* ev)
                                       i18n("Get Friend List Failed"));
         return;
     }
-//    LwqqAsyncEvent* event;
-//    event = lwqq_info_get_group_name_list(lc,NULL);
-//    lwqq_async_add_event_listener(event,_C_(2p,cb_login_stage_2,event,lc));
+    //    LwqqAsyncEvent* event;
+    //    event = lwqq_info_get_group_name_list(lc,NULL);
+    //    lwqq_async_add_event_listener(event,_C_(2p,cb_login_stage_2,event,lc));
 
     const LwqqHashEntry* succ_hash = lwqq_hash_get_last(lc);
     lwdb_userdb_write(ac->db, "last_hash", succ_hash->name);
@@ -2260,7 +2188,7 @@ static void get_friends_info_retry(LwqqClient* lc,LwqqHashFunc hashtry)
 static void confirm_table_yes(LwqqConfirmTable* table,const char *input, LwqqAnswer answer)
 {
     if(table->exans_label){
-       table->answer = answer;
+        table->answer = answer;
     }else
         table->answer = LWQQ_YES;
     if(table->input_label){
@@ -2353,7 +2281,7 @@ static void system_message(LwqqClient* lc,LwqqMsgSystem* system,LwqqBuddy* buddy
         LwqqConfirmTable* ct =(LwqqConfirmTable*)s_malloc0(sizeof(*ct));
         ct->title = s_strdup(_("Friend Confirm"));
         snprintf(buf2,sizeof(buf2),
-                _("%s\nRequest as your friend\nAdditional Reason:%s\n\n"),system->account,system->verify_required.msg);
+                 _("%s\nRequest as your friend\nAdditional Reason:%s\n\n"),system->account,system->verify_required.msg);
         format_body_from_buddy(buf2,sizeof(buf2),buddy);
         ct->body = s_strdup(buf2);
         ct->exans_label = s_strdup(_("Agree and add back"));
@@ -2426,10 +2354,10 @@ void qq_add_buddy( LwqqClient* lc, const char *username, const char *message)
         f_buddy->cate_index = 0;
     }else
         f_buddy->cate_index = cate->index;
-        //friend->qqnumber = s_strdup(qqnum);
-        LwqqAsyncEvent* ev = lwqq_info_search_friend(lc,uni_id,f_buddy);
-        const char* msg = NULL;
-        lwqq_async_add_event_listener(ev, _C_(4p,search_buddy_receipt,ev,f_buddy,s_strdup(uni_id),s_strdup(msg)));
+    //friend->qqnumber = s_strdup(qqnum);
+    LwqqAsyncEvent* ev = lwqq_info_search_friend(lc,uni_id,f_buddy);
+    const char* msg = NULL;
+    lwqq_async_add_event_listener(ev, _C_(4p,search_buddy_receipt,ev,f_buddy,s_strdup(uni_id),s_strdup(msg)));
 
 }
 
@@ -2496,7 +2424,7 @@ static void do_no_thing(void* data,const char* text)
 }
 static void qq_add_group(LwqqClient* lc, const char *name)
 {
-   search_group(lc, name);
+    search_group(lc, name);
 }
 
 static void write_buddy_to_db(LwqqClient* lc,LwqqBuddy* b)
@@ -2511,8 +2439,8 @@ static void set_cgroup_block(LwqqConfirmTable* ct,LwqqClient* lc,LwqqGroup* g)
 {
     if(ct->answer != LWQQ_IGNORE){
         lwqq_async_add_event_listener(
-                lwqq_info_mask_group(lc,g,(int)ct->answer),
-                _C_(p,cb_qq_set_group_name,g));
+                    lwqq_info_mask_group(lc,g,(int)ct->answer),
+                    _C_(p,cb_qq_set_group_name,g));
     }
     lwqq_ct_free(ct);
 }
@@ -2553,22 +2481,22 @@ static void cb_flush_group_members(LwqqClient* lc,LwqqGroup** g){printf("*******
 Kopete::OnlineStatus statusFromLwqqStatus(LwqqStatus status)
 {
     switch(status) {
-	case LWQQ_STATUS_LOGOUT:
-      return QQProtocol::protocol()->QQLogout;
-	case LWQQ_STATUS_ONLINE:
-      return QQProtocol::protocol()->QQOnline;
-	case LWQQ_STATUS_OFFLINE:
-      return QQProtocol::protocol()->QQOffline;
-	case LWQQ_STATUS_AWAY:
-      return QQProtocol::protocol()->QQAway;
-	case LWQQ_STATUS_HIDDEN:
-      return QQProtocol::protocol()->QQHidden;
-	case LWQQ_STATUS_BUSY:
-      return QQProtocol::protocol()->QQBusy;
-	case LWQQ_STATUS_CALLME:
-      return QQProtocol::protocol()->QQCallme;
-	default:
-      return QQProtocol::protocol()->QQOffline;
+    case LWQQ_STATUS_LOGOUT:
+        return QQProtocol::protocol()->QQLogout;
+    case LWQQ_STATUS_ONLINE:
+        return QQProtocol::protocol()->QQOnline;
+    case LWQQ_STATUS_OFFLINE:
+        return QQProtocol::protocol()->QQOffline;
+    case LWQQ_STATUS_AWAY:
+        return QQProtocol::protocol()->QQAway;
+    case LWQQ_STATUS_HIDDEN:
+        return QQProtocol::protocol()->QQHidden;
+    case LWQQ_STATUS_BUSY:
+        return QQProtocol::protocol()->QQBusy;
+    case LWQQ_STATUS_CALLME:
+        return QQProtocol::protocol()->QQCallme;
+    default:
+        return QQProtocol::protocol()->QQOffline;
     }
     
 }
