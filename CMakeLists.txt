@@ -12,9 +12,9 @@ set(CMAKE_MODULE_PATH
 
 #add_subdirectory( liblwqq )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "-fpermissive")
-endif(CMAKE_COMPILER_IS_GNUCXX) 
+#if(CMAKE_COMPILER_IS_GNUCXX)
+#	set(CMAKE_CXX_FLAGS "-fpermissive")
+#endif(CMAKE_COMPILER_IS_GNUCXX) 
 
 find_package(KDE4 REQUIRED)
 

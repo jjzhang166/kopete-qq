@@ -75,7 +75,6 @@
 
 #include "qqloginverifywidget.h"
 
-#include "js.h"
 #include "qq_types.h"
 #include "translate.h"
 
@@ -241,10 +240,16 @@ void QQAccount::initLwqqAccount()
     LwqqExtension* db_ext = lwdb_make_extension(ac->db);
     db_ext->init(ac->qq, db_ext);
     ac->qq->data = ac;
-
+    lwqq_get_http_handle(ac->qq)->ssl = 1;
     //for empathy
     lwqq_bit_set(ac->flag,QQ_USE_QQNUM,ac->db!=NULL);
     if(ac->db){
+        const char* url = "http://pidginlwqq.sinaapp.com/statics.php";
+        char post[128];
+        snprintf(post,sizeof(post),"v=0.3.1");
+        LwqqHttpRequest *req = lwqq_http_request_new(url);
+        req->lc = ac->qq;
+        req->do_request_async(req,1,post,_C_(p,lwqq_http_request_free,req));
         lwqq_override(ac->font.family,s_strdup(lwdb_userdb_read(ac->db, "f_family")));
         ac->font.size = s_atoi(lwdb_userdb_read(ac->db,"f_size"),ac->font.size);
         ac->font.style = s_atoi(lwdb_userdb_read(ac->db,"f_style"),ac->font.style);
@@ -328,9 +333,9 @@ void QQAccount::slotReceivedInstanceSignal(CallbackObject cb)
         this->ac_login_stage_1(lc, err);
     }
     else if(cb.fun_t == LOGIN_STAGE_2)
-    {
-        LwqqClient* lc = (LwqqClient*)(cb.ptr1);
-        LwqqAsyncEvent *ev = (LwqqAsyncEvent *)(cb.ptr2);
+    {        
+        LwqqAsyncEvent *ev = (LwqqAsyncEvent *)(cb.ptr1);
+        LwqqClient* lc = (LwqqClient*)(cb.ptr2);
         this->ac_login_stage_2(ev,lc);
     }
     else if(cb.fun_t == LOGIN_STAGE_3)
@@ -1202,6 +1207,7 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
 {
     LwqqErrorCode err = *p_err;
     QString message;
+    if(!lwqq_client_valid(lc)) return;
     switch(err){
     case LWQQ_EC_OK:
         message = i18n( "Connect OK");
@@ -1269,7 +1275,7 @@ void QQAccount::afterLogin(LwqqClient *lc)
 
 void QQAccount::ac_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
 {
-    if(event->result != LWQQ_EC_OK){
+    if(event->result != int(LWQQ_EC_OK)){
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, \
                                       i18n("Get Group List Failed"));
         //printf("Get group list failed, error code is %d\n", event->result);
@@ -1522,7 +1528,7 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
     LwqqBuddy* buddy;
     LIST_FOREACH(buddy,&lc->friends,entries) {
         lwdb_userdb_query_buddy(ac->db, buddy);
-        if(! buddy->qqnumber){
+        if((ac->flag& QQ_USE_QQNUM)&&! buddy->qqnumber){
             ev = lwqq_info_get_friend_qqnumber(lc,buddy);
             lwqq_async_evset_add_event(set, ev);
         }
@@ -1701,7 +1707,7 @@ void QQAccount::connectWithPassword( const QString &passwd )
     }
 
     /*try to connect to lwqq*/
-    lwqq_get_http_handle(m_lc)->ssl = 0;
+
     LwqqErrorCode err;
     //    Kopete::AvatarQueryJob *queryJob = new Kopete::AvatarQueryJob(this);
     //    queryJob->setQueryFilter(Kopete::AvatarManager::All);
@@ -2013,8 +2019,8 @@ static void cb_login_stage_2(LwqqAsyncEvent* event,LwqqClient* lc)
 {
     CallbackObject cb;
     cb.fun_t = LOGIN_STAGE_2;
-    cb.ptr1 = (void *)lc;
-    cb.ptr2 = (void *)event;
+    cb.ptr1 = (void *)event;
+    cb.ptr2 = (void *)lc;
     ObjectInstance::instance()->callSignal(cb);
 }
 
@@ -2171,7 +2177,8 @@ static void friends_valid_hash(LwqqAsyncEvent* ev)
                                       i18n("Hash Function Wrong, Please try again later or report to author"));
         return;
     }
-    if(ev->result != LWQQ_EC_OK){
+    fprintf(stderr, "err info :%d \n", ev->result );
+    if(ev->result != int(LWQQ_EC_OK)){
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, \
                                       i18n("Get Friend List Failed"));
         return;
@@ -2182,8 +2189,10 @@ static void friends_valid_hash(LwqqAsyncEvent* ev)
 
     const LwqqHashEntry* succ_hash = lwqq_hash_get_last(lc);
     lwdb_userdb_write(ac->db, "last_hash", succ_hash->name);
+    fprintf(stderr, "last_hash name:%s\n", succ_hash->name);
     LwqqAsyncEvent* event;
     event = lwqq_info_get_group_name_list(lc, succ_hash->func, succ_hash->data);
+    fprintf(stderr, "friends_valid_hash:event:%p, lc:%p \n", event, lc);
     lwqq_async_add_event_listener(event,_C_(2p,cb_login_stage_2,event,lc));
 }
 
