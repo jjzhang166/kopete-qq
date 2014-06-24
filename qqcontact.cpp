@@ -50,14 +50,14 @@
 #include "qqcontact.h"
 
 QQContact::QQContact( Kopete::Account* _account, const QString &uniqueName,
-		const QString &displayName, Kopete::MetaContact *parent )
-: Kopete::Contact( _account, uniqueName, parent )
+                      const QString &displayName, Kopete::MetaContact *parent )
+    : Kopete::Contact( _account, uniqueName, parent )
 {
-	kDebug( 14210 ) << " uniqueName: " << uniqueName << ", displayName: " << displayName;
+    kDebug( 14210 ) << " uniqueName: " << uniqueName << ", displayName: " << displayName;
     m_displayName = displayName;
     m_userId = uniqueName;
-	m_type = QQContact::Null;
-	// FIXME: ? setDisplayName( displayName );
+    m_type = QQContact::Null;
+    // FIXME: ? setDisplayName( displayName );
     m_chatManager = 0L;
     m_groupManager = 0L;
     m_discuManager = 0L;
@@ -66,7 +66,7 @@ QQContact::QQContact( Kopete::Account* _account, const QString &uniqueName,
     m_isGroupDestory = false;
     m_isSetGroupInfo = false;
     m_account = _account;
-	setOnlineStatus( QQProtocol::protocol()->QQOffline );
+    setOnlineStatus( QQProtocol::protocol()->QQOffline );
 }
 
 QQContact::~QQContact()
@@ -75,7 +75,7 @@ QQContact::~QQContact()
 
 void QQContact::setType( QQContact::Type type )
 {
-	m_type = type;
+    m_type = type;
 }
 
 bool QQContact::isReachable()
@@ -86,16 +86,16 @@ bool QQContact::isReachable()
 void QQContact::serialize( QMap< QString, QString > &serializedData, QMap< QString, QString > & /* addressBookData */ )
 {
     QString value;
-	switch ( m_type )
-	{
-	case Null:
-		value = QLatin1String("null");
-	case Echo:
-		value = QLatin1String("echo");
-	case Group:
-		value = QLatin1String("group");
-	}
-	serializedData[ "contactType" ] = value;
+    switch ( m_type )
+    {
+    case Null:
+        value = QLatin1String("null");
+    case Echo:
+        value = QLatin1String("echo");
+    case Group:
+        value = QLatin1String("group");
+    }
+    serializedData[ "contactType" ] = value;
 }
 
 Kopete::ChatSession* QQContact::manager( CanCreateFlags canCreateFlags )
@@ -202,17 +202,17 @@ QList<KAction *> *QQContact::customContextMenuActions() //OBSOLETE
         }
         m_blockAction->setEnabled(true);
         actions->append( m_blockAction );
-         tempCollection.addAction(QLatin1String("contactViewBlock"), m_blockAction);
+        tempCollection.addAction(QLatin1String("contactViewBlock"), m_blockAction);
     }
-//    if(!m_profileAction)
-//    {
-//        m_profileAction = new KAction( KIcon("document-preview"), i18n( "&View QQ Profile" ), this );
-//        connect( m_profileAction, SIGNAL(triggered(bool)), this, SLOT(slotUserInfo()) );
-//    }
-//    m_profileAction->setEnabled( true );
-//    actions->append( m_profileAction );
-//    // temporary action collection, used to apply Kiosk policy to the actions
-//    tempCollection.addAction(QLatin1String("contactViewProfile"), m_profileAction);
+    //    if(!m_profileAction)
+    //    {
+    //        m_profileAction = new KAction( KIcon("document-preview"), i18n( "&View QQ Profile" ), this );
+    //        connect( m_profileAction, SIGNAL(triggered(bool)), this, SLOT(slotUserInfo()) );
+    //    }
+    //    m_profileAction->setEnabled( true );
+    //    actions->append( m_profileAction );
+    //    // temporary action collection, used to apply Kiosk policy to the actions
+    //    tempCollection.addAction(QLatin1String("contactViewProfile"), m_profileAction);
     return actions;
 }
 
@@ -223,8 +223,8 @@ void QQContact::slotBlock()
 
 void QQContact::showContactSettings()
 {
-	//QQContactSettings* p = new QQContactSettings( this );
-	//p->show();
+    //QQContactSettings* p = new QQContactSettings( this );
+    //p->show();
 }
 
 
@@ -263,24 +263,24 @@ void QQContact::clean_contact()
 
 void QQContact::setDisplayPicture(const QByteArray &data)
 {
-	//setProperty( QQProtocol::protocol()->iconCheckSum, checksum );	
-	Kopete::AvatarManager::AvatarEntry entry;
-	entry.name = contactId();
-	entry.category = Kopete::AvatarManager::Contact;
-	entry.contact = this;
+    //setProperty( QQProtocol::protocol()->iconCheckSum, checksum );
+    Kopete::AvatarManager::AvatarEntry entry;
+    entry.name = contactId();
+    entry.category = Kopete::AvatarManager::Contact;
+    entry.contact = this;
     entry.image = QImage::fromData(data);
-	entry = Kopete::AvatarManager::self()->add(entry);
+    entry = Kopete::AvatarManager::self()->add(entry);
     //kDebug(WEBQQ_GEN_DEBUG) <<"setDisplayPicture:"<< entry.dataPath;
-	if (!entry.dataPath.isNull())
-	{
+    if (!entry.dataPath.isNull())
+    {
         this->removeProperty(Kopete::Global::Properties::self()->photo());
         //setProperty( Kopete::Global::Properties::self()->photo(), QString() );
         this->setProperty( Kopete::Global::Properties::self()->photo() , entry.dataPath );
-//        this->setIcon(entry.dataPath);
-//        this->setUseCustomIcon(true);
+        //        this->setIcon(entry.dataPath);
+        //        this->setUseCustomIcon(true);
         //kDebug(WEBQQ_GEN_DEBUG) << "datePath:" << entry.dataPath;
-		//emit displayPictureChanged();
-	}
+        //emit displayPictureChanged();
+    }
 }
 
 
@@ -354,26 +354,26 @@ void QQContact::slotTyping(bool isTyping_ )
 
 void QQContact::sendMessage( Kopete::Message &message )
 {
-	kDebug( 14210 ) ;
+    kDebug( 14210 ) ;
 
-	/*this is for test*/    
-	QString targetQQNumber = message.to().first()->contactId();
-    kDebug(WEBQQ_GEN_DEBUG)<<"parsedBody:"<<message.parsedBody()<<message.plainBody();
+    /*this is for test*/
+    QString targetQQNumber = message.to().first()->contactId();
+    //kDebug(WEBQQ_GEN_DEBUG)<<"parsedBody:"<<message.parsedBody()<<message.plainBody();
     QString messageStr = message.format() ==  Qt::RichText?prepareMessage(message.parsedBody(), message.plainBody()) :message.plainBody();
     //QString messageStr = prepareMessage(message.parsedBody(), message.plainBody());
-    kDebug(WEBQQ_GEN_DEBUG)<<"send text:"<<messageStr;
+    //kDebug(WEBQQ_GEN_DEBUG)<<"send text:"<<messageStr;
     if(m_contactType == Contact_Group || m_contactType == Contact_Discu)
         qq_send_chat(m_userId.toUtf8().constData(), messageStr.toUtf8().constData());
     else if(m_contactType == Contact_Chat)
         qq_send_im(((QQAccount*)account())->m_lc, targetQQNumber.toUtf8().constData(), messageStr.toUtf8().constData(), m_contactType);
     else if(m_contactType == Contact_Session)
     {
-       QString whoStr = m_userId + " ### " + m_sessionId;
+        QString whoStr = m_userId + " ### " + m_sessionId;
         qq_send_im(((QQAccount*)account())->m_lc, whoStr.toUtf8().constData(), messageStr.toUtf8().constData(), m_contactType);
     }
-	// give it back to the manager to display
+    // give it back to the manager to display
     manager(CanCreate)->appendMessage( message );
-	// tell the manager it was sent successfully
+    // tell the manager it was sent successfully
     manager(CanCreate)->messageSucceeded();
 }
 
@@ -392,14 +392,14 @@ QString QQContact::prepareMessage(const QString &messageText, const QString &pla
         reMsg += "<u>";
     if((pos = newMsg.indexOf("color:#")) >= 0)
     {
-    size = QString("color:#").size();
-    reMsg += "<font color=\"#" + newMsg.mid(pos+size, 6) + "\">" ;
+        size = QString("color:#").size();
+        reMsg += "<font color=\"#" + newMsg.mid(pos+size, 6) + "\">" ;
     }
     if((pos = newMsg.indexOf("font-family:'")) >= 0)
     {
-    endPos = newMsg.indexOf("';");
-    size = QString("font-family:'").size();
-    reMsg +="<font face=\"" + newMsg.mid(pos + size, endPos - pos - size ) + "\">";
+        endPos = newMsg.indexOf("';");
+        size = QString("font-family:'").size();
+        reMsg +="<font face=\"" + newMsg.mid(pos + size, endPos - pos - size ) + "\">";
     }
     if((pos = newMsg.indexOf("font-size:")) >= 0)
     {
@@ -439,25 +439,25 @@ void QQContact::set_group_name(const QString &name)
 static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* what,long retry)
 {
     printf("[%s] \n", __FUNCTION__);
-    qq_account* ac = lwqq_async_event_get_owner(ev)->data; 
+    qq_account* ac = lwqq_async_event_get_owner(ev)->data;
     LwqqMsgMessage* mmsg = (LwqqMsgMessage*)msg;
-    if(lwqq_async_event_get_code(ev)==LWQQ_CALLBACK_FAILED) 
+    if(lwqq_async_event_get_code(ev)==LWQQ_CALLBACK_FAILED)
     {
-       s_free(what);
-      s_free(serv_id);
-      lwqq_msg_free(msg);
+        s_free(what);
+        s_free(serv_id);
+        lwqq_msg_free(msg);
     }
     
-   
+
 
     if(ev == NULL){
 
     }else{
         int err = lwqq_async_event_get_result(ev);
-        static char buf[1024]={0};
+        //static char buf[1024]={0};
         if(err > 0){
-            snprintf(buf,sizeof(buf),_("Send failed, err:%d:\n%s"),err,what);            
-	    printf("FUNCTION: %s, %s\n",__FUNCTION__, buf);
+            //snprintf(buf,sizeof(buf),_("Send failed, err:%d:\n%s"),err,what);
+            printf("FUNCTION: %s\n",__FUNCTION__);
         }
         if(err == LWQQ_EC_LOST_CONN){
             vp_do_repeat(ac->qq->events->poll_lost, NULL);
@@ -471,10 +471,10 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
     {
 
     }
-    if(msg->type == LWQQ_MS_GROUP_MSG) 
-      mmsg->group.group_code = NULL;
-    else if(msg->type == LWQQ_MS_DISCU_MSG) 
-      mmsg->discu.did = NULL;
+    if(msg->type == LWQQ_MS_GROUP_MSG)
+        mmsg->group.group_code = NULL;
+    else if(msg->type == LWQQ_MS_DISCU_MSG)
+        mmsg->discu.did = NULL;
 failed:
     s_free(what);
     s_free(serv_id);
@@ -538,7 +538,7 @@ static int find_group_and_member_by_gid(LwqqClient* lc,const char* card,LwqqGrou
         strcpy(gid,pos+strlen(" ### "));
         strncpy(uin,card,pos-card);
         uin[pos-card] = '\0';
-         *p_g = find_group_by_gid(lc,gid);
+        *p_g = find_group_by_gid(lc,gid);
         if(LIST_EMPTY(&(*p_g)->members)){
             return -1;
         }
@@ -592,12 +592,12 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
     mmsg->f_size = ac->font.size;
     mmsg->f_style = ac->font.style;
     strcpy(mmsg->f_color,"000000");
-    fprintf(stderr, "msg:%s\n", what);
+    //fprintf(stderr, "msg:%s\n", what);
     translate_message_to_struct(NULL, NULL, what, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(lc,mmsg);
     lwqq_async_add_event_listener(ev,_C_(4pl, cb_send_receipt,ev,msg,strdup(who),strdup(what), 2L));
-    fprintf(stderr, "qq send im\n");
+    //fprintf(stderr, "qq send im\n");
     return 1;
 }
 
@@ -634,20 +634,20 @@ int QQContact::qq_send_chat(const char *gid, const char *message)
 
 void QQContact::receivedMessage( const QString &message )
 {
-    kDebug(WEBQQ_GEN_DEBUG) << "receivedMessage:" << message;
+    kDebug(WEBQQ_GEN_DEBUG) << "receivedMessage:" ;
     QDateTime msgDT;
     msgDT.setTime_t(time(0L));
     Kopete::ContactPtrList contactList;
-	contactList.append( account()->myself() );
-	// Create a Kopete::Message
-	Kopete::Message newMessage( this, contactList );
+    contactList.append( account()->myself() );
+    // Create a Kopete::Message
+    Kopete::Message newMessage( this, contactList );
     //newMessage.setPlainBody( message );
     newMessage.setTimestamp( msgDT );
     newMessage.setHtmlBody(message);
-	newMessage.setDirection( Kopete::Message::Inbound );
+    newMessage.setDirection( Kopete::Message::Inbound );
 
-	// Add it to the manager
-	manager(CanCreate)->appendMessage (newMessage);
+    // Add it to the manager
+    manager(CanCreate)->appendMessage (newMessage);
 }
 
 void QQContact::set_group_members()
@@ -660,7 +660,7 @@ void QQContact::set_group_members()
 
 void QQContact::slotChatSessionDestroyed()
 {
-	//FIXME: the chat window was closed?  Take appropriate steps.
+    //FIXME: the chat window was closed?  Take appropriate steps.
     if(m_contactType == Contact_Group)
     {
         m_groupManager = 0L;

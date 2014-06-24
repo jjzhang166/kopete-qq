@@ -66,7 +66,7 @@ find_package(Kopete REQUIRED)
 
 
 # Generate config-kopete.h
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config-kopete.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kopete.h )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 # For config-kopete.h
 #include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -86,7 +86,7 @@ include_directories(
 ${KOPETE_INCLUDE_DIRS} 
 ${KOPETE_INCLUDE_DIRS}/ui/
 ${CMAKE_CURRENT_SOURCE_DIR}/ui/ 
-${CMAKE_CURRENT_SOURCE_DIR}/liblwqq/lib/
+${LWQQ_INCLUDE_DIRS}
 )
 
 

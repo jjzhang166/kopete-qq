@@ -602,7 +602,7 @@ void QQAccount::ac_display_user_info(qq_account *ac, LwqqBuddy *b, char *who)
 
 void QQAccount::receivedGroupMessage(LwqqClient *lc, LwqqGroup *group, LwqqMsgMessage *msg)
 {
-    //kDebug(WEBQQ_GEN_DEBUG)()<<"receivedGroupMessage";
+    kDebug(WEBQQ_GEN_DEBUG)()<<"receivedGroupMessage";
     qq_account *ac = lwqq_client_userdata(lc);
     if(LIST_EMPTY(&group->members))
     {
@@ -659,7 +659,7 @@ void QQAccount::rewrite_group_msg(const QString &id)
         QDateTime msgDT;
         msgDT.setTime_t(message->when);
         Kopete::Message kmsg( contact(sendId), justMe );
-        kDebug(WEBQQ_GEN_DEBUG)<<"group message:"<<sendMsg;
+        kDebug(WEBQQ_GEN_DEBUG)<<"group message:";
         kmsg.setTimestamp( msgDT );
         kmsg.setHtmlBody(sendMsg);
         kmsg.setDirection( Kopete::Message::Inbound );
@@ -1809,7 +1809,7 @@ void QQAccount::receivedMessage( const QString &message )
     Kopete::Contact* contact = contacts().value(from);
     messageSender = dynamic_cast<QQContact *>( contact );
 
-    kWarning( 14210 ) << " got a message from " << from << ", " << messageSender << ", is: " << message;
+    //kWarning( 14210 ) << " got a message from " << from << ", " << messageSender << ", is: " << message;
     // Pass it on to the contact to pocess and display via a KMM
     if ( messageSender )
         messageSender->receivedMessage( message );

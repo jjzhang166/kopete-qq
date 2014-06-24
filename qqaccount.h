@@ -27,11 +27,7 @@
 #include "qqbridgecallback.h"
 #include <kjob.h>
 /*include the header of lwqq*/
-extern "C"
-{
-#include "lwqq.h"
-#include "lwdb.h"
-}
+
 #include "qq_types.h"
 
 

@@ -19,10 +19,7 @@
 
 #include <QVariant>
 
-extern "C"
-{
-#include "lwqq.h"
-}
+#include "qq_types.h"
 
 typedef enum  {
   NEED_VERIFY2 = 0,/*call ac_need_verify2(LwqqClient* lc,LwqqVerifyCode* code)*/
