@@ -1,11 +1,6 @@
-#ifndef _LWQQ_CONFIG_H__
-#define _LWQQ_CONFIG_H__
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
 
-#cmakedefine ENABLE_NLS
-#cmakedefine WITH_LIBEV
-#cmakedefine WITH_LIBUV
-#cmakedefine WITHOUT_ASYNC
-#cmakedefine SSL
+#define GLOBAL_DATADIR "@datadir@"
 
 #endif /* __CONFIG_H__ */
-

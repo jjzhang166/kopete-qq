@@ -7,9 +7,11 @@ extern "C"
 {
   #include "lwqq.h"
   #include "lwdb.h"
+  #include "lwjs.h"
+  #include "utility.h"
+  #include <unistd.h>
 }
 #include "config.h"
-#include "js.h"
 #ifdef ENABLE_NLS
 #define _(s) s
 #else
@@ -92,7 +94,7 @@ enum ConType { Contact_Chat, Contact_Group, Contact_Discu, Contact_Session};
 typedef struct qq_account {
     LwqqClient* qq;
     LwdbUserDB* db;
-    qq_js_t* js;
+    lwqq_js_t* js;
     int disable_send_server;///< this ensure not send buddy category change etc event to server
     connect_state state;
     

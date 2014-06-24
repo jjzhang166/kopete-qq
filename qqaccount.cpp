@@ -234,9 +234,24 @@ void QQAccount::initLwqqAccount()
     init_client_events(ac->qq);
 
     ac->db = lwdb_userdb_new(username,NULL,0);
+//    ac->qq->data = ac;
+
+//    lwqq_bit_set(ac->flag,QQ_USE_QQNUM,ac->db!=NULL);
+
+    LwqqExtension* db_ext = lwdb_make_extension(ac->db);
+    db_ext->init(ac->qq, db_ext);
     ac->qq->data = ac;
 
+    //for empathy
     lwqq_bit_set(ac->flag,QQ_USE_QQNUM,ac->db!=NULL);
+    if(ac->db){
+        lwqq_override(ac->font.family,s_strdup(lwdb_userdb_read(ac->db, "f_family")));
+        ac->font.size = s_atoi(lwdb_userdb_read(ac->db,"f_size"),ac->font.size);
+        ac->font.style = s_atoi(lwdb_userdb_read(ac->db,"f_style"),ac->font.style);
+
+        const char* last_hash = lwdb_userdb_read(ac->db, "last_hash");
+        if(last_hash) lwqq_hash_set_beg(ac->qq, last_hash);
+    }
 
 
 
@@ -602,7 +617,7 @@ void QQAccount::ac_display_user_info(qq_account *ac, LwqqBuddy *b, char *who)
 
 void QQAccount::receivedGroupMessage(LwqqClient *lc, LwqqGroup *group, LwqqMsgMessage *msg)
 {
-    kDebug(WEBQQ_GEN_DEBUG)()<<"receivedGroupMessage";
+    kDebug(WEBQQ_GEN_DEBUG)<<"receivedGroupMessage";
     qq_account *ac = lwqq_client_userdata(lc);
     if(LIST_EMPTY(&group->members))
     {
@@ -1244,11 +1259,11 @@ void QQAccount::pollMessage()
 
 void QQAccount::afterLogin(LwqqClient *lc)
 {
-    char path[512];
-    if(access(LOCAL_HASH_JS(path),F_OK)==0)
-        get_friends_info_retry(lc, hash_with_local_file);
-    else
-        get_friends_info_retry(lc, hash_with_remote_file);
+//    char path[512];
+//    if(access(LOCAL_HASH_JS(path),F_OK)==0)
+//        get_friends_info_retry(lc, hash_with_local_file);
+//    else
+//        get_friends_info_retry(lc, hash_with_remote_file);
 
 }
 
@@ -2127,22 +2142,22 @@ static void verify_required_confirm(LwqqClient* lc,char* account,LwqqConfirmTabl
 
 
 
-static char* hash_with_local_file(const char* uin,const char* ptqq,void* js)
-{
-    char path[512];
-    qq_jso_t* obj = (qq_jso_t*)qq_js_load(js,LOCAL_HASH_JS(path));
-    char* res = qq_js_hash(uin, ptqq, js);
-    qq_js_unload((qq_js_t*)js, obj);
-    return res;
-}
+//static char* hash_with_local_file(const char* uin,const char* ptqq,void* js)
+//{
+//    char path[512];
+//    qq_jso_t* obj = (qq_jso_t*)qq_js_load(js,LOCAL_HASH_JS(path));
+//    char* res = qq_js_hash(uin, ptqq, js);
+//    qq_js_unload((qq_js_t*)js, obj);
+//    return res;
+//}
 
-static char* hash_with_remote_file(const char* uin,const char* ptqq,void* js)
-{
-    //github.com is too slow
-    qq_download("http://pidginlwqq.sinaapp.com/hash.js",
-                "hash.js", lwdb_get_config_dir());
-    return hash_with_local_file(uin, ptqq, js);
-}
+//static char* hash_with_remote_file(const char* uin,const char* ptqq,void* js)
+//{
+//    //github.com is too slow
+//    qq_download("http://pidginlwqq.sinaapp.com/hash.js",
+//                "hash.js", lwdb_get_config_dir());
+//    return hash_with_local_file(uin, ptqq, js);
+//}
 
 static void friends_valid_hash(LwqqAsyncEvent* ev)
 {

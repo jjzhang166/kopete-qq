@@ -1,4 +1,4 @@
-project(kopete-qq)
+project(kopete-webqq)
 set(LWQQ_VERSION_MAJOR "0")
 set(LWQQ_VERSION_MINOR "3")
 set(LWQQ_VERSION_PATCH "1")
@@ -31,8 +31,8 @@ include(CheckTypeSize)
 add_definitions( -DKDE_DEFAULT_DEBUG_AREA=14210 )
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBJS REQUIRED mozjs185)
 pkg_check_modules(LWQQ REQUIRED lwqq>=${LWQQ_VERSION_MAJOR}.${LWQQ_VERSION_MINOR}.${LWQQ_VERSION_PATCH})
+set(SHARE_DIR "${CMAKE_INSTALL_PREFIX}/share")
 
 
 set(CMAKE_REQUIRED_DEFINITIONS ${_KDE4_PLATFORM_DEFINITIONS})
@@ -65,7 +65,7 @@ find_package(Kopete REQUIRED)
 #KDE4_NO_ENABLE_FINAL(kopete)
 
 
-# Generate config-kopete.h
+set(datadir ${SHARE_DIR}/lwqq)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 # For config-kopete.h
@@ -82,7 +82,6 @@ add_subdirectory( emoticons )
 
 
 include_directories( 
-#kopete
 ${KOPETE_INCLUDE_DIRS} 
 ${KOPETE_INCLUDE_DIRS}/ui/
 ${CMAKE_CURRENT_SOURCE_DIR}/ui/ 
@@ -107,7 +106,6 @@ set(kopete_qq_PART_SRCS
    qqdiscuchatsession.cpp
    qqgroupchatsession.cpp
    qqshowgetinfo.cpp
-   js.cpp
    translate.cpp
    trex.cpp
    ui/qqwebcamdialog.cpp 
@@ -127,22 +125,22 @@ kde4_add_ui_files(kopete_qq_PART_SRCS
 qquserinfoform.ui
 )
 
-kde4_add_plugin(kopete_qq ${kopete_qq_PART_SRCS})
+kde4_add_plugin(kopete_webqq ${kopete_qq_PART_SRCS})
 
 
 #target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
-target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
+target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
 if(NOT DISABLE_VIDEOSUPPORT)
-  target_link_libraries(kopete_qq kopete_videodevice)
+  target_link_libraries(kopete_webqq kopete_videodevice)
 endif(NOT DISABLE_VIDEOSUPPORT)
 
 #Urgly!!!
 set(PLUGIN_INSTALL_DIR "/usr/lib/kde4/")
 set(SERVICES_INSTALL_DIR "/usr/share/kde4/services/")
  
-install(TARGETS kopete_qq  DESTINATION ${PLUGIN_INSTALL_DIR})
+install(TARGETS kopete_webqq  DESTINATION ${PLUGIN_INSTALL_DIR})
 
 ########### install files ###############
 
-install( FILES kopete_qq.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
-install( FILES qqdiscuui.rc qqchatui.rc qqgroupui.rc  DESTINATION ${DATA_INSTALL_DIR}/kopete_qq)
+install( FILES kopete_webqq.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install( FILES qqdiscuui.rc qqchatui.rc qqgroupui.rc  DESTINATION ${DATA_INSTALL_DIR}/kopete_webqq)
