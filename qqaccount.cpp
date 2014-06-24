@@ -954,6 +954,7 @@ void QQAccount::ac_friend_avatar(LwqqClient* lc, LwqqBuddy *buddy)
         friendContact->setOnlineStatus(qqStatus);
         friendContact->setContactType(Contact_Chat);
         friendContact->setProperty(Kopete::Global::Properties::self ()->nickName (), displayName);
+        //friendContact->setNickName(displayName);
         QObject::connect(friendContact, SIGNAL(getUserInfoSignal(QString,ConType)), \
                          this, SLOT(slotGetUserInfo(QString,ConType)));
         /*set the contact's icon*/
@@ -1042,6 +1043,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                                 contact(QString(buddy->qqnumber))->set_session_info(QString((group->type == LWQQ_GROUP_QUN? group->gid:group->did)), \
                                                                                     QString::fromUtf8(group->name));
                                 contact(QString(buddy->qqnumber))->setProperty(Kopete::Global::Properties::self ()->nickName (), contactName);
+                                //contact(QString(buddy->qqnumber))->setNickName(contactName);
                                 //contact(QString(buddy->qqnumber))->setOnlineStatus(statusFromLwqqStatus(buddy->stat));
                                 QObject::connect(contact(QString(buddy->qqnumber)), SIGNAL(getUserInfoSignal(QString,ConType)),\
                                                  this, SLOT(slotGetUserInfo(QString,ConType)));
@@ -1057,6 +1059,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                                 contact(QString(buddy->uin))->set_session_info(g_id, \
                                                                                QString::fromUtf8(group->name));
                                 contact(QString(buddy->uin))->setProperty(Kopete::Global::Properties::self ()->nickName (), contactName);
+                                //contact(QString(buddy->uin))->setNickName(contactName);
                                 //contact(QString(buddy->uin))->setOnlineStatus(statusFromLwqqStatus(buddy->stat));
                                 QObject::connect(contact(QString(buddy->uin)), SIGNAL(getUserInfoSignal(QString,ConType)),\
                                                  this, SLOT(slotGetUserInfo(QString,ConType)));
@@ -1078,6 +1081,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                             contact(QString(member->qq) )->setContactType(Contact_Session);
                             contact(QString(member->qq) )->set_session_info(g_id, QString::fromUtf8(group->name));
                             contact(QString(member->qq))->setProperty(Kopete::Global::Properties::self ()->nickName (), contactName);
+                            //contact(QString(buddy->qq))->setNickName(contactName);
                             //contact(QString(member->qq))->setOnlineStatus(statusFromLwqqStatus(member->stat));
                             QObject::connect(contact(QString(member->qq)), SIGNAL(getUserInfoSignal(QString,ConType)),\
                                              this, SLOT(slotGetUserInfo(QString,ConType)));
@@ -1092,6 +1096,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
                             contact(QString(member->uin) )->setContactType(Contact_Session);
                             contact(QString(member->uin) )->set_session_info(g_id, QString::fromUtf8(group->name));
                             contact(QString(member->uin))->setProperty(Kopete::Global::Properties::self ()->nickName (), contactName);
+                            //contact(QString(buddy->uin))->setNickName(contactName);
                             //contact(QString(member->uin))->setOnlineStatus(statusFromLwqqStatus(member->stat));
                             QObject::connect(contact(QString(member->uin)), SIGNAL(getUserInfoSignal(QString,ConType)),\
                                              this, SLOT(slotGetUserInfo(QString,ConType)));
@@ -1518,8 +1523,10 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
     if(ac->flag & QQ_USE_QQNUM){  //QQ_USE_QQNUM
         lwdb_userdb_query_qqnumbers(ac->db,lc);
     }
-    myself ()->setProperty (Kopete::Global::Properties::self ()->nickName (),
-                            QString::fromUtf8(lc->myself->nick));
+//    myself ()->setProperty (Kopete::Global::Properties::self ()->nickName (),
+//                            QString::fromUtf8(lc->myself->nick));
+    myself()->setNickName(QString::fromUtf8(lc->myself->nick));
+    kDebug(WEBQQ_GEN_DEBUG)<<"photo path:"<<myself()->property(Kopete::Global::Properties::self()->photo()).value().toString();
     LwqqAsyncEvent* lwev=lwqq_info_get_friend_avatar(lc,lc->myself);
     lwqq_async_add_event_listener(lwev,_C_(2p,cb_friend_avatar,ac,lc->myself));
 

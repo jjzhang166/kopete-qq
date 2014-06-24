@@ -100,7 +100,7 @@ void qq_dispatch(LwqqCommand cmd)
     did_dispatch(d);
 }
 
-//#ifdef WITH_MOZJS
+#ifdef WITH_MOZJS
 static char* hash_with_local_file(const char* uin,const char* ptwebqq,lwqq_js_t* js)
 {
     char path[512] = {0};
@@ -134,7 +134,7 @@ static char* hash_with_db_url(const char* uin,const char* ptwebqq,qq_account* ac
     if(qq_download(url,"hash.js",lwdb_get_config_dir())==LWQQ_EC_ERROR) return NULL;
     return hash_with_local_file(uin, ptwebqq, ac->js);
 }
-//#endif
+#endif
 qq_account* qq_account_new(char *username, char *password)
 {
     qq_account* ac = (qq_account*)malloc(sizeof(qq_account));
@@ -144,12 +144,12 @@ qq_account* qq_account_new(char *username, char *password)
     
     ac->qq = lwqq_client_new(username, password);
     ac->js = lwqq_js_init();
-//#ifdef WITH_MOZJS
+#ifdef WITH_MOZJS
     fprintf(stderr, "WITH_MOZJS\n");
     lwqq_hash_add_entry(ac->qq, "hash_local", (LwqqHashFunc)hash_with_local_file,  ac->js);
     lwqq_hash_add_entry(ac->qq, "hash_url",   (LwqqHashFunc)hash_with_remote_file, ac->js);
     lwqq_hash_add_entry(ac->qq, "hash_db",    (LwqqHashFunc)hash_with_db_url,      ac);
-//#endif
+#endif
     ac->font.family = s_strdup("宋体");
     ac->font.size = 12;
     ac->font.style = 0;
