@@ -196,7 +196,6 @@ void QQAccount::setOnlineStatus(const Kopete::OnlineStatus& status, const Kopete
 
 void QQAccount::init_client_events(LwqqClient *lc)
 {
-    fprintf(stderr, "init_client_events:%p", lc);
     lwqq_add_event(lc->events->login_complete,
                    _C_(2p,cb_login_stage_1,lc, &lc->args->login_ec));
     lwqq_add_event(lc->events->new_friend,
@@ -257,9 +256,6 @@ void QQAccount::initLwqqAccount()
         const char* last_hash = lwdb_userdb_read(ac->db, "last_hash");
         if(last_hash) lwqq_hash_set_beg(ac->qq, last_hash);
     }
-
-
-
 
 }
 

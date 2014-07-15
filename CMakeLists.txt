@@ -130,9 +130,6 @@ kde4_add_plugin(kopete_webqq ${kopete_qq_PART_SRCS})
 
 #target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
 target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
-if(NOT DISABLE_VIDEOSUPPORT)
-  target_link_libraries(kopete_webqq kopete_videodevice)
-endif(NOT DISABLE_VIDEOSUPPORT)
 
 #Urgly!!!
 set(PLUGIN_INSTALL_DIR "/usr/lib/kde4/")
