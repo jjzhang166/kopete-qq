@@ -40,7 +40,7 @@ namespace Kopete
     class Message;
 }
 
-class QQProtocol;
+class WebqqProtocol;
 class QByteArray;
 class QQContact;
 typedef QList<group_msg> MsgDataList;
@@ -52,7 +52,7 @@ class QQAccount : public Kopete::PasswordedAccount
 {
 	Q_OBJECT
 public:
-    QQAccount( QQProtocol *parent, const QString& accountID );
+    QQAccount( WebqqProtocol *parent, const QString& accountID );
     ~QQAccount();
 	/**
 	 * Construct the context menu used for the status bar icon
@@ -217,7 +217,7 @@ private:
     Kopete::OnlineStatus m_targetStatus; 
     /* lwqq async option */
     LwqqEvents m_async_opt;
-    QQProtocol *m_protocol;
+    WebqqProtocol *m_protocol;
     
     QTimer *pollTimer;
     QByteArray avatarData;
