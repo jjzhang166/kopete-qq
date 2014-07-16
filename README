@@ -1,0 +1,12 @@
+This is a QQ's kopete plugin library is used lwqq:https://github.com/xiehuc/lwqq or http://git.oschina.net/zhjun5337/kopete-qq.git
+
+Currently functions: 1 chat with friends, send text, picture 
+                     2 receiver chat groups and discussion groups, shielding message.
+
+Due to frequent changes Webqq protocol, if not used, or appear bug, submit it on issues github.
+
+
+
+
+
+
