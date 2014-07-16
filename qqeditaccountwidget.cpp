@@ -56,7 +56,7 @@ Kopete::Account* QQEditAccountWidget::apply()
 		// FIXME: ? account()->setAccountLabel(accountName);
 		account()->myself()->setProperty( Kopete::Global::Properties::self()->nickName(), accountName );
 	else
-		setAccount( new QQAccount( QQProtocol::protocol(), accountName ) );
+        setAccount( new QQAccount( WebqqProtocol::protocol(), accountName ) );
 
 	return account();
 }

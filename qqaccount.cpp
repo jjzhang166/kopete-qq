@@ -88,14 +88,14 @@
     lwdb_get_config_dir()),buf)
 
 
-QQAccount::QQAccount( QQProtocol *parent, const QString& accountID )
+QQAccount::QQAccount( WebqqProtocol *parent, const QString& accountID )
     : Kopete::PasswordedAccount ( parent, accountID, false)
 {	
     m_protocol = parent;
     m_lc = NULL;
     // Init the myself contact
     setMyself( new QQContact( this, accountId(), accountId(), Kopete::ContactList::self()->myself() ) );
-    myself()->setOnlineStatus( m_protocol->QQOffline );
+    myself()->setOnlineStatus( m_protocol->WebqqOffline );
 
     /*init lwqq account*/
     //initLwqqAccount();
@@ -983,7 +983,7 @@ void QQAccount::ac_group_avatar(LwqqClient *lc, LwqqGroup *group)
 
     /*first set its stat*/
     //Kopete::OnlineStatus qqStatus = statusFromLwqqStatus(buddy->stat);
-    //contact->setOnlineStatus(m_protocol->QQOnline );
+    //contact->setOnlineStatus(m_protocol->WebqqOnline );
 
     /*set the contact's icon*/
     kDebug(WEBQQ_GEN_DEBUG) <<"contact icon:" << bytearry.size();
@@ -1108,7 +1108,7 @@ void QQAccount::ac_group_members(LwqqClient *lc, LwqqGroup *group)
         if(gContact)
         {
             gContact->set_group_members();
-            //gContact->setOnlineStatus( QQProtocol::protocol()->QQOnline);
+            //gContact->setOnlineStatus( WebqqProtocol::protocol()->WebqqOnline);
         }
     }
     contact(g_id)->set_group_status(false);
@@ -1222,25 +1222,25 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
         disconnected( Manual );			// don't reconnect
         message = i18n( "Login Abnormal!");
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-        myself()->setOnlineStatus( m_protocol->QQOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
         return ;
     case LWQQ_EC_NETWORK_ERROR:
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->QQOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
         message = i18n( "Network error!");
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
     case LWQQ_EC_LOGIN_NEED_BARCODE:
         kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->QQOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
         message = i18n(lc->error_description);
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
     default:
         kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->QQOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqOffline);
         message = i18n(lc->last_err);
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
@@ -1634,7 +1634,7 @@ void QQAccount::setStatusMessage(const Kopete::StatusMessage& statusMessage)
 void QQAccount::connect( const Kopete::OnlineStatus& /* initialStatus */ )
 {
     kDebug ( 14210 ) ;
-    //myself()->setOnlineStatus( QQProtocol::protocol()->qqOnline );
+    //myself()->setOnlineStatus( WebqqProtocol::protocol()->qqOnline );
     login();
     QObject::connect ( m_server, SIGNAL (messageReceived(QString)),
                        this, SLOT (receivedMessage(QString)) );
@@ -1651,7 +1651,7 @@ void QQAccount::connectWithPassword( const QString &passwd )
     }
 
     if ( isConnected() ||
-         myself()->onlineStatus() == m_protocol->QQConnecting )
+         myself()->onlineStatus() == m_protocol->WebqqConnecting )
     {
         return;
 
@@ -1670,12 +1670,12 @@ void QQAccount::connectWithPassword( const QString &passwd )
 
     if ( passwd.isNull() )
     { //cancel the connection attempt
-        static_cast<QQContact*>( myself() )->setOnlineStatus( m_protocol->QQOffline );
+        static_cast<QQContact*>( myself() )->setOnlineStatus( m_protocol->WebqqOffline );
         return;
     }
 
 
-    static_cast<QQContact *>( myself() )->setOnlineStatus( m_protocol->QQConnecting );
+    static_cast<QQContact *>( myself() )->setOnlineStatus( m_protocol->WebqqConnecting );
 
 
     /*
@@ -1737,7 +1737,7 @@ void QQAccount::disconnect()
     //QObject::disconnect(pollTimer, 0, 0, 0);
     destoryLwqqAccount();/*destory this lwqq client*/
 
-    myself()->setOnlineStatus( m_protocol->QQOffline );
+    myself()->setOnlineStatus( m_protocol->WebqqOffline );
 
 }
 
@@ -1751,7 +1751,7 @@ void QQAccount::slotGoOnline ()
     }
     else
     {
-        myself()->setOnlineStatus( m_protocol->QQOnline );
+        myself()->setOnlineStatus( m_protocol->WebqqOnline );
         lwqq_info_change_status(m_lc, LWQQ_STATUS_ONLINE);
     }
     //updateContactStatus();
@@ -1766,7 +1766,7 @@ void QQAccount::slotGoAway ()
         connect();
     else
     {
-        myself()->setOnlineStatus( m_protocol->QQAway );
+        myself()->setOnlineStatus( m_protocol->WebqqAway );
         lwqq_info_change_status(m_lc, LWQQ_STATUS_AWAY);
     }
     //updateContactStatus();
@@ -1780,7 +1780,7 @@ void QQAccount::slotGoHidden()
         connect();
     else
     {
-        myself()->setOnlineStatus( m_protocol->QQHidden );
+        myself()->setOnlineStatus( m_protocol->WebqqHidden );
         lwqq_info_change_status(m_lc, LWQQ_STATUS_HIDDEN);
     }
 }
@@ -1794,7 +1794,7 @@ void QQAccount::slotGoBusy ()
         connect();
     else
     {
-        myself()->setOnlineStatus( m_protocol->QQBusy );
+        myself()->setOnlineStatus( m_protocol->WebqqBusy );
         lwqq_info_change_status(m_lc, LWQQ_STATUS_BUSY);
     }
     //updateContactStatus();
@@ -2509,21 +2509,21 @@ Kopete::OnlineStatus statusFromLwqqStatus(LwqqStatus status)
 {
     switch(status) {
     case LWQQ_STATUS_LOGOUT:
-        return QQProtocol::protocol()->QQLogout;
+        return WebqqProtocol::protocol()->WebqqLogout;
     case LWQQ_STATUS_ONLINE:
-        return QQProtocol::protocol()->QQOnline;
+        return WebqqProtocol::protocol()->WebqqOnline;
     case LWQQ_STATUS_OFFLINE:
-        return QQProtocol::protocol()->QQOffline;
+        return WebqqProtocol::protocol()->WebqqOffline;
     case LWQQ_STATUS_AWAY:
-        return QQProtocol::protocol()->QQAway;
+        return WebqqProtocol::protocol()->WebqqAway;
     case LWQQ_STATUS_HIDDEN:
-        return QQProtocol::protocol()->QQHidden;
+        return WebqqProtocol::protocol()->WebqqHidden;
     case LWQQ_STATUS_BUSY:
-        return QQProtocol::protocol()->QQBusy;
+        return WebqqProtocol::protocol()->WebqqBusy;
     case LWQQ_STATUS_CALLME:
-        return QQProtocol::protocol()->QQCallme;
+        return WebqqProtocol::protocol()->WebqqCallme;
     default:
-        return QQProtocol::protocol()->QQOffline;
+        return WebqqProtocol::protocol()->WebqqOffline;
     }
     
 }

@@ -66,7 +66,7 @@ QQContact::QQContact( Kopete::Account* _account, const QString &uniqueName,
     m_isGroupDestory = false;
     m_isSetGroupInfo = false;
     m_account = _account;
-    setOnlineStatus( QQProtocol::protocol()->QQOffline );
+    setOnlineStatus( WebqqProtocol::protocol()->WebqqOffline );
 }
 
 QQContact::~QQContact()
@@ -263,7 +263,7 @@ void QQContact::clean_contact()
 
 void QQContact::setDisplayPicture(const QByteArray &data)
 {
-    //setProperty( QQProtocol::protocol()->iconCheckSum, checksum );
+    //setProperty( WebqqProtocol::protocol()->iconCheckSum, checksum );
     Kopete::AvatarManager::AvatarEntry entry;
     entry.name = contactId();
     entry.category = Kopete::AvatarManager::Contact;
@@ -626,6 +626,8 @@ int QQContact::qq_send_chat(const char *gid, const char *message)
     translate_message_to_struct(ac->qq, group->gid, message, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(ac->qq,mmsg);
+    if(ev == NULL && ac->qq == NULL)
+        fprintf(stderr, "ev is NULL\n");
     lwqq_async_add_event_listener(ev, _C_(4pl,cb_send_receipt,ev,msg,s_strdup(group->gid),s_strdup(message), 2L));
 
 

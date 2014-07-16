@@ -1,5 +1,5 @@
 /*
-    qqprotocol.cpp - Kopete QQ Protocol
+    qqprotocol.cpp - Kopete Webqq Protocol
 
     Copyright (c) 2014      by Jun Zhang             <jun.zhang@i-soft.com.cn>
     Copyright (c) 2003      by Will Stephenson		 <will@stevello.free-online.co.u>
@@ -33,26 +33,26 @@
 
 #include "qqprotocol.h"
 
-K_PLUGIN_FACTORY( QQProtocolFactory, registerPlugin<QQProtocol>(); )
-K_EXPORT_PLUGIN( QQProtocolFactory( "kopete_webqq" ) )
+K_PLUGIN_FACTORY( WebqqProtocolFactory, registerPlugin<WebqqProtocol>(); )
+K_EXPORT_PLUGIN( WebqqProtocolFactory( "kopete_webqq" ) )
 
-QQProtocol *QQProtocol::s_protocol = 0L;
+WebqqProtocol *WebqqProtocol::s_protocol = 0L;
 
-QQProtocol::QQProtocol( QObject* parent, const QVariantList &/*args*/ )
-	: Kopete::Protocol( QQProtocolFactory::componentData(), parent ),
-	  QQLogout(  Kopete::OnlineStatus::Offline, 25, this, 0,  QStringList(QString()),
+WebqqProtocol::WebqqProtocol( QObject* parent, const QVariantList &/*args*/ )
+    : Kopete::Protocol( WebqqProtocolFactory::componentData(), parent ),
+      WebqqLogout(  Kopete::OnlineStatus::Offline, 25, this, 0,  QStringList(QString()),
 			  i18n( "Offline" ),   i18n( "Of&fline" ), Kopete::OnlineStatusManager::Offline ),
-	  QQOnline(	Kopete::OnlineStatus::Online, 25, this, 0,  QStringList(QString()),
+      WebqqOnline(	Kopete::OnlineStatus::Online, 25, this, 0,  QStringList(QString()),
 			  i18n( "Online" ),   i18n( "O&nline" ), Kopete::OnlineStatusManager::Online,Kopete::OnlineStatusManager::HasStatusMessage),
-	  QQOffline(  Kopete::OnlineStatus::Offline, 25, this, 2,  QStringList(QString()),
+      WebqqOffline(  Kopete::OnlineStatus::Offline, 25, this, 2,  QStringList(QString()),
 			  i18n( "Offline" ),   i18n( "Of&fline" ), Kopete::OnlineStatusManager::Offline ),
-	  QQAway(  Kopete::OnlineStatus::Away, 25, this, 1, QStringList(QLatin1String("away")),
+      WebqqAway(  Kopete::OnlineStatus::Away, 25, this, 1, QStringList(QLatin1String("away")),
 			  i18n( "Away" ),   i18n( "&Away" ), Kopete::OnlineStatusManager::Away ),
-	  QQBusy(  Kopete::OnlineStatus::Busy, 25, this, 1, QStringList(QLatin1String("Busy")),
+      WebqqBusy(  Kopete::OnlineStatus::Busy, 25, this, 1, QStringList(QLatin1String("Busy")),
 			  i18n( "Busy" ),   i18n( "&Busy" ), Kopete::OnlineStatusManager::Busy ), 
-	  QQHidden(  Kopete::OnlineStatus::Invisible, 25, this, 1, QStringList(QLatin1String("Invisible")),
+      WebqqHidden(  Kopete::OnlineStatus::Invisible, 25, this, 1, QStringList(QLatin1String("Invisible")),
 			  i18n( "Invisible" ),   i18n( "&Invisible" ), Kopete::OnlineStatusManager::Invisible ), 
-	  QQConnecting( Kopete::OnlineStatus::Connecting,2, this, 555, QStringList(QString::fromUtf8("qq_connecting")),    
+      WebqqConnecting( Kopete::OnlineStatus::Connecting,2, this, 555, QStringList(QString::fromUtf8("qq_connecting")),
 		      i18n( "Connecting" ), i18n("Connecting"), 0, Kopete::OnlineStatusManager::HideFromMenu ),	  
 	  iconCheckSum("iconCheckSum", i18n("Buddy Icon Checksum"), QString(), Kopete::PropertyTmpl::PersistentProperty | Kopete::PropertyTmpl::PrivateProperty),	  
 	  propNick("iconCheckSum", i18n("Buddy Icon Checksum"), QString(), Kopete::PropertyTmpl::PersistentProperty | Kopete::PropertyTmpl::PrivateProperty),
@@ -77,11 +77,11 @@ QQProtocol::QQProtocol( QObject* parent, const QVariantList &/*args*/ )
     setCapabilities( FullRTF);
 }
 
-QQProtocol::~QQProtocol()
+WebqqProtocol::~WebqqProtocol()
 {
 }
 
-Kopete::Contact *QQProtocol::deserializeContact(
+Kopete::Contact *WebqqProtocol::deserializeContact(
 	Kopete::MetaContact *metaContact, const QMap<QString, QString> &serializedData,
 	const QMap<QString, QString> &/* addressBookData */)
 {
@@ -114,29 +114,29 @@ Kopete::Contact *QQProtocol::deserializeContact(
 		return 0;
 	}
 
-	QQContact * contact = new QQContact(account, contactId, displayName, metaContact);
+    QQContact * contact = new QQContact(account, contactId, displayName, metaContact);
 	contact->setType( tbcType );
 	return contact;
 }
 
-AddContactPage * QQProtocol::createAddContactWidget( QWidget *parent, Kopete::Account * /* account */ )
+AddContactPage * WebqqProtocol::createAddContactWidget( QWidget *parent, Kopete::Account * /* account */ )
 {
 	kDebug( 14210 ) << "Creating Add Contact Page";
 	return new QQAddContactPage( parent );
 }
 
-KopeteEditAccountWidget * QQProtocol::createEditAccountWidget( Kopete::Account *account, QWidget *parent )
+KopeteEditAccountWidget * WebqqProtocol::createEditAccountWidget( Kopete::Account *account, QWidget *parent )
 {
 	kDebug(14210) << "Creating Edit Account Page";
 	return new QQEditAccountWidget( parent, account );
 }
 
-Kopete::Account *QQProtocol::createNewAccount( const QString &accountId )
+Kopete::Account *WebqqProtocol::createNewAccount( const QString &accountId )
 {
 	return new QQAccount( this, accountId );
 }
 
-QQProtocol *QQProtocol::protocol()
+WebqqProtocol *WebqqProtocol::protocol()
 {
 	return s_protocol;
 }

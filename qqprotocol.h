@@ -1,5 +1,5 @@
 /*
-    qqprotocol.h - Kopete QQ Protocol
+    qqprotocol.h - Kopete Webqq Protocol
 
     Copyright (c) 2014      by Jun Zhang             <jun.zhang@i-soft.com.cn>
     Copyright (c) 2003      by Will Stephenson		 <will@stevello.free-online.co.uk>
@@ -27,25 +27,25 @@
  * Encapsulates the generic actions associated with this protocol
  * @author Will Stephenson
  */
-class QQProtocol : public Kopete::Protocol
+class WebqqProtocol : public Kopete::Protocol
 {
 	Q_OBJECT
 public:
-	QQProtocol(QObject *parent, const QVariantList &args);
-	~QQProtocol();
+    WebqqProtocol(QObject *parent, const QVariantList &args);
+    ~WebqqProtocol();
 	
 	//Online Statuses, respect to Lwqq status
-	const Kopete::OnlineStatus QQLogout;
-	const Kopete::OnlineStatus QQOnline;
-	const Kopete::OnlineStatus QQOffline;
-	const Kopete::OnlineStatus QQAway;
-	const Kopete::OnlineStatus QQHidden;
-	const Kopete::OnlineStatus QQBusy;
-	const Kopete::OnlineStatus QQCallme;
-	//const Kopete::OnlineStatus QQInvisible;
+    const Kopete::OnlineStatus WebqqLogout;
+    const Kopete::OnlineStatus WebqqOnline;
+    const Kopete::OnlineStatus WebqqOffline;
+    const Kopete::OnlineStatus WebqqAway;
+    const Kopete::OnlineStatus WebqqHidden;
+    const Kopete::OnlineStatus WebqqBusy;
+    const Kopete::OnlineStatus WebqqCallme;
+    //const Kopete::OnlineStatus WebqqInvisible;
 	
 	/*used to indicate connecting*/
-	const Kopete::OnlineStatus QQConnecting;
+    const Kopete::OnlineStatus WebqqConnecting;
 	
 	/*property*/
 	const Kopete::PropertyTmpl 	iconCheckSum;
@@ -65,7 +65,7 @@ public:
 	const Kopete::PropertyTmpl	propJob;
 	const Kopete::PropertyTmpl	propPersonal;
 	/**
-	 * Convert the serialised data back into a QQContact and add this
+     * Convert the serialised data back into a WebqqContact and add this
 	 * to its Kopete::MetaContact
 	 */
 	virtual Kopete::Contact *deserializeContact(
@@ -74,7 +74,7 @@ public:
 			const QMap< QString, QString > & addressBookData
 		);
 	/**
-	 * Generate the widget needed to add QQContacts
+     * Generate the widget needed to add WebqqContacts
 	 */
 	virtual AddContactPage * createAddContactWidget( QWidget *parent, Kopete::Account *account );
 	/**
@@ -82,16 +82,16 @@ public:
 	 */
 	virtual KopeteEditAccountWidget * createEditAccountWidget( Kopete::Account *account, QWidget *parent );
 	/**
-	 * Generate a QQAccount
+     * Generate a WebqqAccount
 	 */
 	virtual Kopete::Account * createNewAccount( const QString &accountId );
 	/**
 	 * Access the instance of this protocol
 	 */
-	static QQProtocol *protocol();
+    static WebqqProtocol *protocol();
 
 protected:
-	static QQProtocol *s_protocol;
+    static WebqqProtocol *s_protocol;
 };
 
 #endif
