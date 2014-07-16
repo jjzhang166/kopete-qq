@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Service
 X-Kopete-Version=1000900
-Icon=qq_protocol
+Icon=webqq_protocol
 X-KDE-ServiceTypes=Kopete/Protocol
 X-KDE-Library=kopete_webqq
-X-Kopete-Messaging-Protocol=messaging/qq
+X-Kopete-Messaging-Protocol=messaging/webqq
 X-KDE-PluginInfo-Author=Jun Zhang
 X-KDE-PluginInfo-Email=jun.zhang@i-soft.com.cn
 X-KDE-PluginInfo-Name=kopete_webqq

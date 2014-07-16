@@ -34,7 +34,7 @@
 #include "qqprotocol.h"
 
 K_PLUGIN_FACTORY( QQProtocolFactory, registerPlugin<QQProtocol>(); )
-K_EXPORT_PLUGIN( QQProtocolFactory( "kopete_qq" ) )
+K_EXPORT_PLUGIN( QQProtocolFactory( "kopete_webqq" ) )
 
 QQProtocol *QQProtocol::s_protocol = 0L;
 
