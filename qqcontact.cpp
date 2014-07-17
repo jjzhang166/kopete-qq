@@ -439,8 +439,14 @@ void QQContact::set_group_name(const QString &name)
 static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* what,long retry)
 {
     printf("[%s] \n", __FUNCTION__);
-    qq_account* ac = lwqq_async_event_get_owner(ev)->data;
     LwqqMsgMessage* mmsg = (LwqqMsgMessage*)msg;
+    if(ev == NULL)
+    {
+        s_free(what);
+        s_free(serv_id);
+        lwqq_msg_free(msg);
+    }
+    qq_account* ac = lwqq_async_event_get_owner(ev)->data;
     if(lwqq_async_event_get_code(ev)==LWQQ_CALLBACK_FAILED)
     {
         s_free(what);
@@ -455,10 +461,7 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
     }else{
         int err = lwqq_async_event_get_result(ev);
         //static char buf[1024]={0};
-        if(err > 0){
-            //snprintf(buf,sizeof(buf),_("Send failed, err:%d:\n%s"),err,what);
-            printf("FUNCTION: %s\n",__FUNCTION__);
-        }
+
         if(err == LWQQ_EC_LOST_CONN){
             vp_do_repeat(ac->qq->events->poll_lost, NULL);
         }else if(err == 108 && retry>0) {
@@ -475,7 +478,7 @@ static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* 
         mmsg->group.group_code = NULL;
     else if(msg->type == LWQQ_MS_DISCU_MSG)
         mmsg->discu.did = NULL;
-failed:
+done:
     s_free(what);
     s_free(serv_id);
     lwqq_msg_free(msg);
@@ -596,6 +599,11 @@ int qq_send_im( LwqqClient* lc, const char *who, const char *what, ConType type)
     translate_message_to_struct(NULL, NULL, what, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(lc,mmsg);
+    if(!ev)
+    {
+        QString message = i18n( "unable send message!");
+        KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+    }
     lwqq_async_add_event_listener(ev,_C_(4pl, cb_send_receipt,ev,msg,strdup(who),strdup(what), 2L));
     //fprintf(stderr, "qq send im\n");
     return 1;
@@ -626,8 +634,11 @@ int QQContact::qq_send_chat(const char *gid, const char *message)
     translate_message_to_struct(ac->qq, group->gid, message, msg, 1);
 
     LwqqAsyncEvent* ev = lwqq_msg_send(ac->qq,mmsg);
-    if(ev == NULL && ac->qq == NULL)
-        fprintf(stderr, "ev is NULL\n");
+    if(!ev)
+    {
+        QString message = i18n( "unable send message!");
+        KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
+    }
     lwqq_async_add_event_listener(ev, _C_(4pl,cb_send_receipt,ev,msg,s_strdup(group->gid),s_strdup(message), 2L));
 
 

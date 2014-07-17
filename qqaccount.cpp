@@ -1580,10 +1580,8 @@ void QQAccount::ac_login_stage_3(LwqqClient* lc)
         discu_come(lc, discu);
     }
 
-    if(ev != NULL)
-        lwqq_async_add_evset_listener(set, _C_(p,cb_login_stage_f,lc));
 
-
+    lwqq_async_add_evset_listener(set, _C_(p,cb_login_stage_f,lc));
 
     ac->state = LOAD_COMPLETED;
 
