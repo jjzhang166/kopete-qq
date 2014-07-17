@@ -771,7 +771,7 @@ void QQAccount::whisper_message(LwqqClient *lc, LwqqMsgMessage *mmsg)
 
 void QQAccount::ac_qq_msg_check(LwqqClient *lc)
 {
-    //printf("[%s] start\n", __FUNCTION__);
+    printf("[%s] start\n", __FUNCTION__);
     if(!lwqq_client_valid(lc))
         return;
     LwqqRecvMsgList* l = lc->msg_list;
@@ -1222,25 +1222,25 @@ void QQAccount::ac_login_stage_1(LwqqClient* lc,LwqqErrorCode* p_err)
         disconnected( Manual );			// don't reconnect
         message = i18n( "Login Abnormal!");
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
-        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqLogout);
         return ;
     case LWQQ_EC_NETWORK_ERROR:
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqLogout);
         message = i18n( "Network error!");
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
     case LWQQ_EC_LOGIN_NEED_BARCODE:
         kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqLogout);
         message = i18n(lc->error_description);
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
     default:
         kDebug(WEBQQ_GEN_DEBUG)<<"error:"<<err;
         disconnected( Manual );			// don't reconnect
-        myself()->setOnlineStatus( m_protocol->WebqqOffline);
+        myself()->setOnlineStatus( m_protocol->WebqqLogout);
         message = i18n(lc->last_err);
         KMessageBox::queuedMessageBox(Kopete::UI::Global::mainWidget(), KMessageBox::Error, message);
         return;
