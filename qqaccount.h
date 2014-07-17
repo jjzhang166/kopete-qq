@@ -107,7 +107,7 @@ public slots:
 	 */
 	virtual void connectWithPassword( const QString & );
 	/**
-	 * Disconnect from the Yahoo service
+     * Disconnect from the WebQQ service
 	 */
 	virtual void disconnect();
 	
