@@ -1,7 +1,7 @@
 project(kopete-webqq)
 set(LWQQ_VERSION_MAJOR "0")
-set(LWQQ_VERSION_MINOR "3")
-set(LWQQ_VERSION_PATCH "1")
+set(LWQQ_VERSION_MINOR "4")
+set(LWQQ_VERSION_PATCH "0")
 
 
 set(CMAKE_MODULE_PATH 
@@ -29,14 +29,13 @@ include(CheckLibraryExists)
 include(CheckPrototypeExists)
 include(CheckTypeSize)
 add_definitions( -DKDE_DEFAULT_DEBUG_AREA=14210 )
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LWQQ REQUIRED lwqq>=${LWQQ_VERSION_MAJOR}.${LWQQ_VERSION_MINOR}.${LWQQ_VERSION_PATCH})
 set(SHARE_DIR "${CMAKE_INSTALL_PREFIX}/share")
+set(CMAKE_CXX_FLAGS "-fpermissive")
 
 
 set(CMAKE_REQUIRED_DEFINITIONS ${_KDE4_PLATFORM_DEFINITIONS})
-set(CMAKE_CXX_FLAGS "-fpermissive")
 
 if (WIN32)
 	set(DISABLE_VIDEOSUPPORT ON)
@@ -128,8 +127,7 @@ qquserinfoform.ui
 kde4_add_plugin(kopete_webqq ${kopete_qq_PART_SRCS})
 
 
-#target_link_libraries(kopete_qq ${KDE4_KIO_LIBS} kopete  pthread lwqq sqlite3 z curl ${LIBJS_LIBRARIES} ${EV_LIBRARIES})
-target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  lwqq ${LIBJS_LIBRARIES})
+target_link_libraries(kopete_webqq ${KDE4_KIO_LIBS} kopete  lwqq)
 
 #Urgly!!!
 set(PLUGIN_INSTALL_DIR "/usr/lib/kde4/")

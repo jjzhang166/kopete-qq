@@ -161,7 +161,7 @@ qq_account* qq_account_new(char *username, char *password)
 void qq_account_free(qq_account* ac)
 {  
     lwqq_js_close(ac->js);
-    s_free(ac->recent_group_name);
+    //s_free(ac->recent_group_name);
     s_free(ac->font.family);
 #if QQ_USE_FAST_INDEX
     g_hash_table_destroy(ac->fast_index.qqnum_index);

@@ -134,7 +134,6 @@ public slots:
 	void slotReceivedInstanceSignal(CallbackObject cb);
     void blist_change(LwqqClient* lc,LwqqMsgBlistChange* blist);
 	void pollMessage();
-    void afterLogin(LwqqClient* lc);
     /**
      * get group or disu all members
      */

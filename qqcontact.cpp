@@ -53,7 +53,7 @@ QQContact::QQContact( Kopete::Account* _account, const QString &uniqueName,
                       const QString &displayName, Kopete::MetaContact *parent )
     : Kopete::Contact( _account, uniqueName, parent )
 {
-    kDebug( 14210 ) << " uniqueName: " << uniqueName << ", displayName: " << displayName;
+    //kDebug( 14210 ) << " uniqueName: " << uniqueName << ", displayName: " << displayName;
     m_displayName = displayName;
     m_userId = uniqueName;
     m_type = QQContact::Null;
@@ -438,38 +438,25 @@ void QQContact::set_group_name(const QString &name)
 
 static void cb_send_receipt(LwqqAsyncEvent* ev,LwqqMsg* msg,char* serv_id,char* what,long retry)
 {
-    printf("[%s] \n", __FUNCTION__);
     LwqqMsgMessage* mmsg = (LwqqMsgMessage*)msg;
     if(ev == NULL)
     {
         s_free(what);
         s_free(serv_id);
         lwqq_msg_free(msg);
+        return;
     }
-    qq_account* ac = lwqq_async_event_get_owner(ev)->data;
-    if(lwqq_async_event_get_code(ev)==LWQQ_CALLBACK_FAILED)
-    {
-        s_free(what);
-        s_free(serv_id);
-        lwqq_msg_free(msg);
+    qq_account* ac = ev->lc->data;
+    int err = ev->result;
+
+    if(err == LWQQ_EC_LOST_CONN){
+        vp_do_repeat(ac->qq->events->poll_lost, NULL);
+    }else if(err == 108 && retry>0) {
+        LwqqAsyncEvent* event = lwqq_msg_send(ac->qq, mmsg);
+        lwqq_async_add_event_listener(event, _C_(4pl,cb_send_receipt,event, msg, serv_id, what,retry-1));
+        return;
     }
-    
 
-
-    if(ev == NULL){
-
-    }else{
-        int err = lwqq_async_event_get_result(ev);
-        //static char buf[1024]={0};
-
-        if(err == LWQQ_EC_LOST_CONN){
-            vp_do_repeat(ac->qq->events->poll_lost, NULL);
-        }else if(err == 108 && retry>0) {
-            LwqqAsyncEvent* event = lwqq_msg_send(ac->qq, mmsg);
-            lwqq_async_add_event_listener(event, _C_(4pl,cb_send_receipt,event, msg, serv_id, what,retry-1));
-            return;
-        }
-    }
     if(mmsg->upload_retry <0)
     {
 
